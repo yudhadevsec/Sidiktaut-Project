@@ -12,3 +12,34 @@
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-gray-800 rounded-full; }
+
+/* --- SAFARI & IOS FIXES (Tambahkan di paling bawah) --- */
+
+@layer utilities {
+  /* 1. Perbaikan Tinggi Layar (Address Bar Bug) */
+  /* Memaksa class h-screen menggunakan Dynamic Viewport Height (dvh) */
+  .h-screen {
+    height: 100vh; /* Fallback */
+    height: 100dvh; /* iOS Modern */
+  }
+  
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* 2. Perbaikan Poni/Notch iPhone */
+  /* Menambah padding otomatis jika dibuka di iPhone ber-poni */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* 3. Perbaikan Glassmorphism (Blur) di Safari */
+/* Memaksa semua elemen yang punya backdrop-blur untuk mengaktifkan engine Webkit */
+[class*="backdrop-blur"] {
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+}
