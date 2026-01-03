@@ -6,14 +6,17 @@ import { BrowserView, CliView, TeamView } from './components/StaticViews';
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // State khusus mobile menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
   
-  // --- DARK MODE LOGIC (Tetap sama) ---
+  // --- PERBAIKAN DARK MODE (SMART INIT) ---
+  // Cek LocalStorage dulu, kalau kosong cek settingan Laptop/HP user
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) return savedTheme === 'dark';
+        if (savedTheme) {
+            return savedTheme === 'dark';
+        }
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
     return false;
@@ -22,6 +25,8 @@ export default function App() {
   const [ipData, setIpData] = useState<any>(null);
   const [ipCopied, setIpCopied] = useState(false);
 
+  // --- PERBAIKAN EFFECT DARK MODE ---
+  // Langsung tembak class ke HTML root agar tidak jitter
   useEffect(() => {
     const root = window.document.documentElement;
     if (darkMode) {
@@ -33,204 +38,205 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Fetch IP (Tetap sama)
+  // PERBAIKAN 1: MENGATASI CONNECTION ERROR
   useEffect(() => {
     const fetchIp = async () => {
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        if (!res.ok) throw new Error("Limit");
-        const data = await res.json();
-        setIpData(data);
-      } catch (e) {
-        setIpData({ ip: "Unavailable", city: "-", country_code: "-", org: "Connection Limit" });
-      }
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            if (!res.ok) throw new Error("Network response was not ok");
+            const data = await res.json();
+            setIpData(data);
+        } catch (e) {
+            console.error("Fetch Error:", e);
+            setIpData({ 
+                ip: 'Unavailable', 
+                city: 'Unknown', 
+                country_code: '-', 
+                org: 'Connection Limit/Error' 
+            });
+        }
     };
     fetchIp();
   }, []);
 
-  const handleCopyIp = () => {
-     if(ipData?.ip) {
+  const copyIp = () => {
+    if(ipData?.ip && ipData.ip !== 'Unavailable') {
         navigator.clipboard.writeText(ipData.ip);
         setIpCopied(true);
         setTimeout(() => setIpCopied(false), 2000);
-     }
-  }
+    }
+  };
 
-  const navItems = [
-    { id: 'dashboard', label: 'Scanner', icon: Shield },
-    { id: 'browser', label: 'Extension', icon: Globe },
-    { id: 'cli', label: 'CLI Tool', icon: Terminal },
-    { id: 'team', label: 'Tim Kami', icon: Users },
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'browser', label: 'Versi Extension', icon: Globe },
+    { id: 'cli', label: 'Versi CLI', icon: Terminal },
+    { id: 'team', label: 'Our Team', icon: Users },
   ];
 
-  // Animation variants
+  const handleNavClick = (viewId: string) => {
+    setActiveView(viewId);
+    setMobileMenuOpen(false);
+    window.scrollTo(0,0);
+  };
+
   const pageTransition = {
-     initial: { opacity: 0, y: 10 },
-     animate: { opacity: 1, y: 0 },
-     exit: { opacity: 0, y: -10 },
-     transition: { duration: 0.2 }
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -10 },
+    transition: { duration: 0.15, ease: "easeOut" }
   };
 
   return (
-    // PERBAIKAN: Gunakan min-h-screen-ios dan text-rendering optimizeLegibility
-    <div className="flex min-h-screen-ios bg-[#F2F2F7] dark:bg-black transition-colors duration-300 font-sans selection:bg-blue-500/30 overflow-hidden">
+    // Tambahkan 'ease-in-out' agar transisi warna lebih lembut (anti-jitter)
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-white font-sans overflow-hidden transition-colors duration-300 ease-in-out">
       
-      {/* --- MOBILE OVERLAY (Backdrop) --- */}
+      {/* MOBILE HEADER (UPDATED: GRAY TEXT) */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50 transition-colors duration-300">
+         <div className="flex items-center gap-3">
+            <img 
+              src="/logo.png" 
+              alt="Logo SidikTaut" 
+              className="w-8 h-8 object-contain" 
+            />
+            {/* Teks Judul & Subtitle */}
+            <div className="flex flex-col justify-center">
+                <span className="font-bold text-lg leading-none">SidikTaut</span>
+                {/* UBAH WARNA DISINI: text-gray-500 */}
+                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase">Link Analyzer</span>
+            </div>
+         </div>
+         <button onClick={() => setMobileMenuOpen(true)} className="p-2"><Menu size={24}/></button>
+      </div>
+
+      {/* MOBILE DRAWER */}
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      {mobileMenuOpen && (
+        <>
+        <div 
+            className="fixed inset-0 z-[60] bg-black/60 md:hidden"
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm" // High Z-index
-          />
-        )}
+        />
+        <motion.div 
+            initial={{ x: "100%" }} 
+            animate={{ x: 0 }} 
+            exit={{ x: "100%" }} 
+            transition={{ type: "tween", duration: 0.3 }} 
+            className="fixed top-0 right-0 z-[70] w-64 h-full bg-white dark:bg-[#121214] border-l border-gray-100 dark:border-gray-800 flex flex-col md:hidden"
+            onClick={e => e.stopPropagation()}
+        >
+            <div className="flex justify-between items-center p-5 border-b border-gray-100 dark:border-gray-800">
+                <span className="font-bold text-lg text-gray-900 dark:text-white">Menu</span>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                    <X size={20}/>
+                </button>
+            </div>
+            
+            <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+                {menuItems.map(item => (
+                <button key={item.id} onClick={() => handleNavClick(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold ${activeView === item.id ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}>
+                    <item.icon size={18} /> {item.label}
+                </button>
+                ))}
+            </nav>
+
+            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0A0C]">
+                <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-white dark:bg-[#121214] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
+                {darkMode ? <Sun size={18} className="text-amber-500"/> : <Moon size={18} className="text-blue-500"/>} 
+                {darkMode ? 'Light Mode' : 'Dark Mode'}
+                </button>
+            </div>
+        </motion.div>
+    </>
+      )}
       </AnimatePresence>
 
-      {/* --- SIDEBAR --- */}
-      <aside 
-        className={`
-            fixed lg:sticky top-0 h-screen-ios z-50 
-            bg-white/80 dark:bg-[#1C1C1E]/80 
-            backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 
-            border-r border-gray-200 dark:border-white/10
-            transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]
-            ${sidebarCollapsed ? 'w-20' : 'w-72'}
-            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-            pt-safe pb-safe /* PERBAIKAN: Padding aman untuk notch */
-        `}
-      >
-        <div className="h-full flex flex-col justify-between p-4 md:p-6 overflow-y-auto no-scrollbar">
-            {/* Logo Area */}
-            <div>
-                <div className={`flex items-center gap-3 mb-10 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0">
-                        <Shield className="text-white" size={20} />
-                    </div>
-                    {!sidebarCollapsed && (
-                        <div>
-                            <h1 className="font-bold text-xl tracking-tight text-gray-900 dark:text-white">SidikTaut</h1>
-                            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Cyber Intelligence</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* Navigation */}
-                <nav className="space-y-2">
-                    {navItems.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => {
-                                setActiveView(item.id);
-                                setMobileMenuOpen(false); // Tutup menu pas klik di mobile
-                            }}
-                            className={`
-                                w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group
-                                ${activeView === item.id 
-                                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' 
-                                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
-                                }
-                                ${sidebarCollapsed ? 'justify-center px-0' : ''}
-                            `}
-                        >
-                            <item.icon size={22} className={activeView === item.id ? 'animate-pulse' : ''} />
-                            {!sidebarCollapsed && <span className="font-medium text-[15px]">{item.label}</span>}
-                            
-                            {/* Tooltip for Collapsed Mode */}
-                            {sidebarCollapsed && (
-                                <div className="absolute left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                                    {item.label}
-                                </div>
-                            )}
-                        </button>
-                    ))}
-                </nav>
-            </div>
-
-            {/* Bottom Actions */}
-            <div className="space-y-4">
-                 {/* Dark Mode Toggle */}
-                 <button 
-                    onClick={() => setDarkMode(!darkMode)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors ${sidebarCollapsed ? 'justify-center px-0' : ''}`}
-                 >
-                    {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                    {!sidebarCollapsed && <span className="font-medium text-sm">Mode {darkMode ? 'Terang' : 'Gelap'}</span>}
-                 </button>
-
-                 {/* Collapse Toggle (Desktop Only) */}
-                 <button 
-                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                    className="hidden lg:flex w-full items-center justify-center p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                 >
-                    <div className="w-1 h-8 rounded-full bg-gray-200 dark:bg-white/10 group-hover:bg-blue-500 transition-colors" />
-                 </button>
-            </div>
-        </div>
-      </aside>
-
-      {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 relative w-full h-screen-ios overflow-y-auto overflow-x-hidden pt-safe pb-safe">
+      {/* SIDEBAR DESKTOP (UPDATED: GRAY TEXT & FIXED WIDTH BUTTON) */}
+      <aside className={`hidden md:flex flex-col border-r border-gray-100 dark:border-gray-800 bg-white dark:bg-[#121214] transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
          
-         {/* Navbar Mobile (Sticky Top) */}
-         <div className="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200 dark:border-white/10 px-4 py-3 flex items-center justify-between pt-safe">
-            <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
-                    <Shield className="text-white" size={16} />
-                </div>
-                <span className="font-bold text-gray-900 dark:text-white">SidikTaut</span>
-            </div>
-            <button onClick={() => setMobileMenuOpen(true)} className="p-2 text-gray-600 dark:text-white">
-                <Menu size={24} />
-            </button>
+         {/* HEADER SIDEBAR */}
+         <div className={`h-20 flex items-center border-b border-gray-50 dark:border-gray-800/50 ${sidebarCollapsed ? 'justify-center' : 'justify-between px-6'}`}>
+            {!sidebarCollapsed && (
+              <div className="flex items-center gap-3 overflow-hidden">
+                 <div className="shrink-0">
+                    <img 
+                      src="/logo.png" 
+                      alt="Logo SidikTaut" 
+                      className="w-10 h-10 object-contain" 
+                    />
+                 </div>
+                 {/* Stack Title & Subtitle */}
+                 <div className="flex flex-col justify-center">
+                    <span className="font-black text-xl tracking-tight whitespace-nowrap text-gray-900 dark:text-white leading-none">SidikTaut</span>
+                    {/* UBAH WARNA DISINI: text-gray-500 */}
+                    <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase mt-0.5">Link Analyzer</span>
+                 </div>
+              </div>
+            )}
+            <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-xl"><Menu size={24} /></button>
          </div>
 
-         {/* Content Wrapper */}
-         <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12 pb-24 md:pb-12">
-            
-            {/* Header Section (Dynamic) */}
-            <header className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                   <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">
-                      {activeView === 'dashboard' && 'Security Scanner'}
-                      {activeView === 'browser' && 'Browser Protection'}
-                      {activeView === 'cli' && 'Terminal Intelligence'}
-                      {activeView === 'team' && 'Core Team'}
-                   </h2>
-                   <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base">
-                      {activeView === 'dashboard' && 'Analisis link berbahaya menggunakan AI & Threat Intelligence.'}
-                      {activeView === 'browser' && 'Ekstensi browser untuk keamanan realtime saat berselancar.'}
-                      {activeView === 'cli' && 'Tools command line untuk SysAdmin dan Developer.'}
-                      {activeView === 'team' && 'Para pengembang dibalik Project SidikTaut.'}
-                   </p>
-                </div>
-            </header>
+         <nav className="flex-1 p-4 space-y-1">
+            {menuItems.map(item => (
+               <button key={item.id} onClick={() => setActiveView(item.id)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors ${activeView === item.id ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+                 <item.icon size={22} />{!sidebarCollapsed && <span>{item.label}</span>}
+               </button>
+            ))}
+         </nav>
+         <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+            {/* BUTTON DARK MODE DESKTOP: FIXED WIDTH UNTUK MENCEGAH JITTER */}
+            <button onClick={() => setDarkMode(!darkMode)} className={`w-full flex items-center gap-2 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors ${sidebarCollapsed ? 'justify-center' : ''}`}>
+               {darkMode ? <Sun size={20} className="shrink-0"/> : <Moon size={20} className="shrink-0"/>} 
+               {!sidebarCollapsed && (
+                   // min-w-[80px] memastikan lebar teks tidak berubah saat ganti kata Light/Dark
+                   <span className="min-w-[80px] text-left">
+                       {darkMode ? 'Light Mode' : 'Dark Mode'}
+                   </span>
+               )}
+            </button>
+         </div>
+      </aside>
 
-            {/* Dynamic View Content */}
-            <div className="min-h-[60vh]">
+      {/* MAIN CONTENT */}
+      <main className="flex-1 overflow-y-auto pt-20 md:pt-8 px-4 md:px-8 pb-12 relative z-0">
+         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 pointer-events-none -z-10" />
+
+         <div className="max-w-6xl mx-auto min-h-[90vh] flex flex-col relative z-10">
+            <div className="flex-1">
                <AnimatePresence mode="wait">
                    {activeView === 'dashboard' && (
-                     <motion.div key="scanner" {...pageTransition}>
+                     <motion.div key="dashboard" {...pageTransition} className="space-y-8">
                        <Scanner />
-                       
-                       {/* IP Address Widget (Dashboard Only) */}
-                       <div className="mt-12 pt-8 border-t border-gray-200 dark:border-white/5">
-                          <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Device Intelligence</h4>
-                          <div className="glass-panel rounded-[32px] p-1 shadow-sm"> {/* PERBAIKAN: Pakai class glass-panel */}
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-                                  {/* IP Card */}
-                                  <div className="relative group p-5 bg-blue-50 dark:bg-blue-900/10 rounded-[28px] border border-blue-100 dark:border-blue-900/20 overflow-hidden">
-                                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2"><Wifi size={18}/> <span className="text-xs font-black uppercase tracking-wider">Public IP</span></div>
-                                      <div className="flex items-center gap-3">
-                                        <p className="font-mono font-bold text-xl md:text-2xl text-gray-900 dark:text-white tracking-tight">
-                                            {ipData?.ip || "Loading..."}
-                                        </p>
-                                        <button onClick={handleCopyIp} className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-                                            {ipCopied ? <Check size={16} className="text-green-500"/> : <Copy size={16} className="text-gray-400"/>}
-                                        </button>
+                       <div>
+                          <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 text-sm uppercase tracking-wider mb-4 px-1"><Wifi size={18} className="text-blue-500"/> Identitas Koneksi Anda</h3>
+                          
+                          <div className="bg-white dark:bg-[#121214] p-6 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col md:flex-row gap-6">
+                              
+                              {/* IP SECTION */}
+                              <div className="flex-1 bg-gray-50 dark:bg-white/5 rounded-3xl p-6 border border-gray-100 dark:border-gray-800/50 flex flex-col justify-center">
+                                 <div className="flex items-center justify-between mb-4">
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><Globe size={14}/> Public IP</span>
+                                    {ipData?.ip !== 'Unavailable' && (
+                                      <div className="flex items-center gap-2 px-2 py-1 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-900/30">
+                                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                          <span className="text-[10px] font-bold text-green-600 dark:text-green-400">ONLINE</span>
                                       </div>
-                                  </div>
-                                  <div className="p-5 bg-gray-50 dark:bg-white/5 rounded-3xl border border-gray-100 dark:border-white/5">
-                                      <div className="flex items-center gap-2 text-gray-500 mb-2"><Zap size={18}/> <span className="text-xs font-black uppercase tracking-wider">ISP / Organization</span></div>
+                                    )}
+                                 </div>
+                                 <div className="flex items-center justify-between gap-2">
+                                    <h2 className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight break-all">
+                                        {ipData?.ip || "Loading..."}
+                                    </h2>
+                                    <button onClick={copyIp} className="p-3 bg-white dark:bg-black/20 rounded-xl text-gray-400 hover:text-blue-600 border border-gray-50 dark:border-gray-800 shrink-0">
+                                        {ipCopied ? <Check size={20} className="text-green-500"/> : <Copy size={20}/>}
+                                    </button>
+                                 </div>
+                              </div>
+
+                              {/* INFO LAINNYA */}
+                              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div className="p-5 bg-blue-50 dark:bg-blue-900/10 rounded-3xl border border-blue-100 dark:border-blue-900/20">
+                                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2"><Zap size={18}/> <span className="text-xs font-black uppercase tracking-wider">ISP</span></div>
                                       <p className="font-bold text-lg text-gray-900 dark:text-white leading-tight">
                                         {ipData?.org || "Mendeteksi..."}
                                       </p>
