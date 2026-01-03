@@ -2,7 +2,7 @@
  * SIDIKTAUT BACKGROUND SERVICE
  */
 
-const API_ENDPOINT = "http://127.0.0.1:5000/scan";
+const API_ENDPOINT = "https://yudhadevsec.pythonanywhere.com/scan";
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({

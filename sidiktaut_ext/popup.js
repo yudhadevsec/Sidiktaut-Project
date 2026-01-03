@@ -156,10 +156,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const controller = new AbortController();
       setTimeout(() => controller.abort(), 1000);
       
-      await fetch("http://127.0.0.1:5000/scan", { 
+      await fetch("https://yudhadevsec.pythonanywhere.com/scan", { 
         method: "OPTIONS", 
         signal: controller.signal 
       });
+
       
       // Jika berhasil, maka
       ui.status.textContent = "ONLINE";
