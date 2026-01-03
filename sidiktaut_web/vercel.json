@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/backend/api/app.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend/dist/index.html"
+    }
+  ]
+}
