@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, memo } from 'react'; // 1. Tambah 'memo' disini
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, AlertTriangle, Search, Loader2, XCircle, CheckCircle, Eye, X, ChevronLeft, Briefcase, Clock, Fingerprint, HelpCircle, ImageOff, Maximize2, Copy, Check, GitBranch, ChevronDown, ChevronUp, ChevronRight, Map } from 'lucide-react';
 import { scanUrl } from '../services/api'; 
@@ -15,7 +15,8 @@ const THREAT_MAP: Record<string, string> = {
   'default_bad': '⚠️ BAHAYA: Terdeteksi mencurigakan.',
 };
 
-export default function Scanner() {
+// 2. Ubah nama fungsi jadi internal (hapus export default di depan)
+function ScannerComponent() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -264,67 +265,67 @@ export default function Scanner() {
                                {/* TOMBOL NAVIGASI KIRI */}
                                {previewList.length > 1 && (
                                    <button 
-                                       onClick={prevImage}
-                                       disabled={currentImageIndex === 0}
-                                       className="absolute left-4 z-20 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed backdrop-blur-sm transition-all"
+                                           onClick={prevImage}
+                                           disabled={currentImageIndex === 0}
+                                           className="absolute left-4 z-20 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed backdrop-blur-sm transition-all"
                                    >
-                                       <ChevronLeft size={20} />
+                                           <ChevronLeft size={20} />
                                    </button>
                                )}
 
                                {/* TOMBOL NAVIGASI KANAN */}
                                {previewList.length > 1 && (
                                    <button 
-                                       onClick={nextImage}
-                                       disabled={currentImageIndex === previewList.length - 1}
-                                       className="absolute right-4 z-20 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed backdrop-blur-sm transition-all"
+                                           onClick={nextImage}
+                                           disabled={currentImageIndex === previewList.length - 1}
+                                           className="absolute right-4 z-20 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed backdrop-blur-sm transition-all"
                                    >
-                                       <ChevronRight size={20} />
+                                           <ChevronRight size={20} />
                                    </button>
                                )}
 
                                {previewLoading && (
                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-[#0a0a0a] z-10">
-                                        <Loader2 className="animate-spin text-blue-500 mb-2" size={32}/>
-                                        <span className="text-[10px] font-bold text-gray-400">LOADING STEP {currentImageIndex + 1}...</span>
+                                            <Loader2 className="animate-spin text-blue-500 mb-2" size={32}/>
+                                            <span className="text-[10px] font-bold text-gray-400">LOADING STEP {currentImageIndex + 1}...</span>
                                    </div>
                                )}
                                {previewError ? (
                                    <div className="flex flex-col items-center justify-center text-gray-400 p-4 text-center">
-                                        <ImageOff size={48} className="mb-3 opacity-50"/>
-                                        <span className="text-xs font-bold">PREVIEW TIDAK TERSEDIA</span>
-                                        <span className="text-[10px] mt-1 opacity-70">Server memblokir bot screenshot.</span>
+                                            <ImageOff size={48} className="mb-3 opacity-50"/>
+                                            <span className="text-xs font-bold">PREVIEW TIDAK TERSEDIA</span>
+                                            <span className="text-[10px] mt-1 opacity-70">Server memblokir bot screenshot.</span>
                                    </div>
                                ) : (
                                    <>
-                                       <img 
-                                           key={currentImageIndex} // Key penting agar react re-render saat index berubah
-                                           src={getPreviewUrl(previewList[currentImageIndex].url)} 
-                                           alt={`Preview Step ${currentImageIndex + 1}`} 
-                                           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" 
-                                           onLoad={() => setPreviewLoading(false)} 
-                                           onError={() => { setPreviewLoading(false); setPreviewError(true); }} 
-                                       />
-                                       
-                                       {/* CAPTION PENJELASAN DI DALAM GAMBAR (BAGIAN BAWAH) */}
-                                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 pt-10 text-white">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${currentImageIndex === 0 ? 'bg-blue-500' : (currentImageIndex === previewList.length - 1 ? 'bg-purple-500' : 'bg-gray-600')}`}>
-                                                    Step {currentImageIndex + 1}
-                                                </span>
-                                                <span className="text-[10px] opacity-80 uppercase font-bold tracking-wider">
-                                                    {currentImageIndex === 0 ? 'Initial Input' : (currentImageIndex === previewList.length - 1 ? 'Final Destination' : 'Redirect Hop')}
-                                                </span>
-                                            </div>
-                                            <p className="text-xs font-mono truncate opacity-90" title={previewList[currentImageIndex].url}>
-                                                {previewList[currentImageIndex].url}
-                                            </p>
-                                            <p className="text-[10px] font-bold text-gray-400 mt-0.5">Status Code: {previewList[currentImageIndex].status}</p>
-                                       </div>
+                                           <img 
+                                               key={currentImageIndex} // Key penting agar react re-render saat index berubah
+                                               src={getPreviewUrl(previewList[currentImageIndex].url)} 
+                                               alt={`Preview Step ${currentImageIndex + 1}`} 
+                                               className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" 
+                                               onLoad={() => setPreviewLoading(false)} 
+                                               onError={() => { setPreviewLoading(false); setPreviewError(true); }} 
+                                           />
+                                           
+                                           {/* CAPTION PENJELASAN DI DALAM GAMBAR (BAGIAN BAWAH) */}
+                                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 pt-10 text-white">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${currentImageIndex === 0 ? 'bg-blue-500' : (currentImageIndex === previewList.length - 1 ? 'bg-purple-500' : 'bg-gray-600')}`}>
+                                                            Step {currentImageIndex + 1}
+                                                        </span>
+                                                        <span className="text-[10px] opacity-80 uppercase font-bold tracking-wider">
+                                                            {currentImageIndex === 0 ? 'Initial Input' : (currentImageIndex === previewList.length - 1 ? 'Final Destination' : 'Redirect Hop')}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs font-mono truncate opacity-90" title={previewList[currentImageIndex].url}>
+                                                        {previewList[currentImageIndex].url}
+                                                    </p>
+                                                    <p className="text-[10px] font-bold text-gray-400 mt-0.5">Status Code: {previewList[currentImageIndex].status}</p>
+                                           </div>
 
-                                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                                            <div className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white"><Maximize2 size={24}/></div>
-                                       </div>
+                                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                                                    <div className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white"><Maximize2 size={24}/></div>
+                                           </div>
                                    </>
                                )}
                                <button onClick={(e) => { e.stopPropagation(); setShowPreview(false); }} className="absolute top-4 right-4 z-20 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full backdrop-blur-sm transition-colors"><X size={18}/></button>
@@ -511,3 +512,6 @@ export default function Scanner() {
 function StatRow({ label, value, color, bg, icon: Icon }: any) {
   return (<div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10"><div className="flex items-center gap-3"><div className={`p-2 rounded-xl ${bg} ${color}`}><Icon size={18}/></div><span className="text-sm font-bold text-gray-300">{label}</span></div><span className={`text-xl font-black ${color}`}>{value}</span></div>)
 }
+
+// 3. Export menggunakan memo agar component ini tidak di-render ulang jika props/parent berubah
+export default memo(ScannerComponent);
