@@ -448,16 +448,38 @@ function ScannerComponent() {
               
               {!selectedDetail && (
                 <div className="px-6 pt-4 shrink-0">
-                   <div className="flex p-1 bg-gray-100 dark:bg-[#0a0a0a] rounded-2xl border border-gray-100 dark:border-gray-800">
-                     {(['malicious', 'harmless', 'undetected'] as const).map((tab) => (
-                        <button key={tab} onClick={() => setActiveFilter(tab)} className={`flex-1 py-3 rounded-xl text-xs font-bold uppercase transition-colors flex items-center justify-center gap-2 ${activeFilter === tab ? 'bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-white shadow-md' : 'text-gray-500'}`}>
-                           {tab} <span className="bg-gray-200 dark:bg-white/10 px-2 rounded-md text-[10px]">{result[tab] || 0}</span>
-                        </button>
-                     ))}
-                   </div>
+                  {/* Container Tab Abu-abu */}
+                  <div className="flex p-1 bg-gray-100 dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800">
+                    {(['malicious', 'harmless', 'undetected'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveFilter(tab)}
+                        className={`
+                          flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all flex items-center justify-center gap-1.5
+                          ${activeFilter === tab
+                            ? 'bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-white shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                          }
+                        `}
+                      >
+                        {/* Label Kategori */}
+                        {tab}
+
+                        {/* Badge Angka (Counter) */}
+                        <span className={`
+                          px-1.5 py-0.5 rounded-[5px] text-[10px] leading-none
+                          ${activeFilter === tab
+                            ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white'
+                            : 'bg-gray-200 dark:bg-white/5 text-gray-500 dark:text-gray-400'
+                          }
+                        `}>
+                          {result[tab] || 0}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
-
               <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
                    {selectedDetail ? (
                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
