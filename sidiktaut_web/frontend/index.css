@@ -5,6 +5,8 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 dark:bg-[#09090b] dark:text-white antialiased;
+    /* Mencegah overscroll bounce di Safari yang bikin lag */
+    overscroll-behavior-y: none; 
   }
 }
 
@@ -25,6 +27,7 @@
     min-height: 100dvh;
   }
 
+  /* Padding untuk Poni/Notch iPhone */
   body {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
@@ -33,7 +36,42 @@
   }
 }
 
-/* Fix Glassmorphism Safari */
+/* --- OPTIMASI RENDERING (PERFORMA) --- */
+
+/* 1. Fix Tampilan Blur di Safari */
 [class*="backdrop-blur"] {
   -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+}
+
+/* 2. GPU Acceleration untuk Elemen Kaca (Navbar/Sidebar) */
+/* Ini kuncinya agar scroll tetap 120hz meski ada efek blur */
+.bg-white\/80, 
+.dark\:bg-black\/80,
+.backdrop-blur-md,
+.backdrop-blur-xl {
+  will-change: backdrop-filter; /* Memberitahu browser untuk siap-siap */
+  transform: translateZ(0); /* Hack memaksa layer render via GPU */
+}
+
+/* 3. Mode Hemat Baterai / Low End Device */
+/* Jika user mengaktifkan "Reduce Motion" atau di iPhone "Low Power Mode",
+   kita matikan animasi berat & blur agar tidak patah-patah */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Ganti Blur dengan Warna Solid Transparan (Lebih Ringan) */
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
+  }
+  
+  .dark [class*="backdrop-blur"] {
+    background-color: rgba(9, 9, 11, 0.98) !important;
+  }
 }
