@@ -37,7 +37,6 @@ function FeatureCard({ icon: Icon, title, desc }: any) {
 
 // --- BROWSER EXTENSION VIEW ---
 export const BrowserView = memo(function BrowserView() {
-  // Fungsi Download Readme
   const handleDownloadReadme = () => {
     const link = document.createElement('a');
     link.href = '/README.md'; 
@@ -45,19 +44,16 @@ export const BrowserView = memo(function BrowserView() {
     link.click();
   };
 
-  // Fungsi Download Extension ZIP
   const handleDownloadZip = () => {
     const link = document.createElement('a');
-    link.href = '/sidiktaut-ext.zip'; // File Extension
+    link.href = '/sidiktaut-ext.zip'; 
     link.download = 'sidiktaut-ext.zip'; 
     link.click();
   };
 
+  // HAPUS PROP ANIMASI DISINI AGAR TIDAK BENTROK DENGAN APP.TSX
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: "easeOut" }}
-      className="space-y-6 md:space-y-8 pb-12"
-    >
+    <div className="space-y-6 md:space-y-8 pb-12">
       {/* BANNER UTAMA */}
       <div className="bg-blue-700 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 text-white shadow-[0_20px_50px_-10px_rgba(29,78,216,0.2)] relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-10">
         <div className="relative z-10 max-w-2xl w-full">
@@ -142,7 +138,7 @@ export const BrowserView = memo(function BrowserView() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 
@@ -161,7 +157,6 @@ export const CliView = memo(function CliView() {
     }
   };
 
-  // --- FUNGSI DOWNLOAD CLI ---
   const handleDownloadReadme = () => {
     const link = document.createElement('a');
     link.href = '/README.md'; 
@@ -171,7 +166,7 @@ export const CliView = memo(function CliView() {
 
   const handleDownloadCli = () => {
     const link = document.createElement('a');
-    link.href = '/sidiktaut-cli.zip'; // File CLI
+    link.href = '/sidiktaut-cli.zip'; 
     link.download = 'sidiktaut-cli.zip'; 
     link.click();
   };
@@ -182,14 +177,12 @@ export const CliView = memo(function CliView() {
       setTimeout(() => setInstallCopied(false), 2000);
   }
 
+  // HAPUS PROP ANIMASI DISINI JUGA
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: "easeOut" }}
-      className="space-y-6 md:space-y-8 pb-12"
-    >
+    <div className="space-y-6 md:space-y-8 pb-12">
       {/* BANNER CLI */}
       <div className="bg-[#1a1a1a] dark:bg-black rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-8 md:gap-10 border border-gray-800 relative overflow-hidden min-h-[400px] md:min-h-[auto]">
-         
+          
          {/* BACKGROUND LOGOS */}
          <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}>
             <motion.img 
@@ -297,7 +290,7 @@ export const CliView = memo(function CliView() {
             </div>
          </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 
