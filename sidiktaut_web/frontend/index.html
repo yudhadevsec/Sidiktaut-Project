@@ -2,8 +2,11 @@
 <html lang="en" >
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <link rel="icon" type="image/png" href="/asset/logo.png" />
     <title>SidikTaut Link Analyzer</title>
     
@@ -24,53 +27,19 @@
                 darkCard: '#1C1C1E',
                 lightCard: '#FFFFFF',
               }
+            },
+            // PERBAIKAN: Menambahkan dukungan safe-area (poni)
+            spacing: {
+              'safe-top': 'env(safe-area-inset-top)',
+              'safe-bottom': 'env(safe-area-inset-bottom)',
+              'safe-left': 'env(safe-area-inset-left)',
+              'safe-right': 'env(safe-area-inset-right)',
             }
           }
         }
       }
     </script>
-
-    <style>
-      :root {
-        --bg-primary: #F2F2F7;
-        --text-primary: #000000;
-        --card-bg: #FFFFFF; 
-        --card-border: #E5E5EA;
-      }
-      .dark {
-        --bg-primary: #000000;
-        --text-primary: #FFFFFF;
-        --card-bg: #1C1C1E;
-        --card-border: #38383A;
-      }
-
-      body {
-        background-color: var(--bg-primary);
-        color: var(--text-primary);
-        font-family: 'Inter', sans-serif;
-        -webkit-font-smoothing: antialiased;
-        overflow-x: hidden; 
-        width: 100%;
-      }
-
-      /* Card Styles */
-      .ios-card {
-        background-color: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); 
-      }
-
-      .glass-input {
-        background-color: var(--card-bg);
-        border: 1px solid var(--card-border);
-      }
-      
-      /* Hide Scrollbar */
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
-
+    
     <script type="importmap">
     {
       "imports": {
@@ -83,7 +52,7 @@
     }
     </script>
     <link rel="stylesheet" href="/index.css">
-  </head>
+</head>
   <body>
     <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-100 via-gray-200 to-gray-300 dark:from-[#2C2C2E] dark:via-[#000000] dark:to-[#000000]"></div>
     

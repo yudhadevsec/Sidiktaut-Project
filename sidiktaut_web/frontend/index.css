@@ -5,7 +5,41 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 dark:bg-[#09090b] dark:text-white antialiased;
+    /* PERBAIKAN: Mencegah efek 'karet' (bounce) saat scroll mentok di Safari */
+    overscroll-behavior-y: none;
+    /* PERBAIKAN: Support font native Apple */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
+}
+
+/* PERBAIKAN UTAMA: Glassmorphism Safari Support */
+/* Class khusus untuk panel kaca agar support di semua browser */
+.glass-panel {
+  @apply bg-white/70 dark:bg-[#1C1C1E]/70 border border-gray-200 dark:border-white/10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Wajib untuk Safari lama */
+}
+
+/* Scrollbar Minimalis */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-gray-700 rounded-full; }
+
+/* PERBAIKAN: Utility class untuk mengatasi 100vh issue di Mobile */
+@layer utilities {
+  .min-h-screen-ios {
+    min-height: 100vh; /* Fallback */
+    min-height: 100dvh; /* Dynamic Viewport Height (Modern Browsers) */
+  }
+  
+  .h-screen-ios {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* Padding aman untuk iPhone ber-poni */
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 }
 
 /* Scrollbar Minimalis (Wajib biar rapi) */
