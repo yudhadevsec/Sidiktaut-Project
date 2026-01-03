@@ -27,36 +27,69 @@ export default function App() {
 
   // --- PERBAIKAN EFFECT DARK MODE ---
   // Langsung tembak class ke HTML root agar tidak jitter
+  // --- PERBAIKAN 2: SMART IP FETCH (Cache + Backup API) ---
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (darkMode) {
-        root.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-    } else {
-        root.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-    }
-  }, [darkMode]);
+    const fetchIpSmart = async () => {
+      // 1. CEK CACHE DULU (Session Storage)
+      // Biar gak boros kuota API kalau user refresh halaman
+      const cached = sessionStorage.getItem('sidiktaut_ip_cache');
+      if (cached) {
+        setIpData(JSON.parse(cached));
+        return;
+      }
 
-  // PERBAIKAN 1: MENGATASI CONNECTION ERROR
-  useEffect(() => {
-    const fetchIp = async () => {
+      try {
+        // 2. COBA PROVIDER UTAMA (ipapi.co)
+        // Kelebihan: Data akurat, deteksi Org bagus.
+        const res = await fetch('https://ipapi.co/json/');
+        if (!res.ok) throw new Error("Limit");
+        
+        const data = await res.json();
+        const cleanData = {
+            ip: data.ip,
+            city: data.city,
+            country_code: data.country_code,
+            org: data.org
+        };
+        
+        setIpData(cleanData);
+        sessionStorage.setItem('sidiktaut_ip_cache', JSON.stringify(cleanData));
+
+      } catch (e) {
+        console.warn("Primary IP API failed, switching to backup...");
+        
         try {
-            const res = await fetch('https://ipapi.co/json/');
-            if (!res.ok) throw new Error("Network response was not ok");
-            const data = await res.json();
-            setIpData(data);
-        } catch (e) {
-            console.error("Fetch Error:", e);
+            // 3. JIKA GAGAL, COBA PROVIDER CADANGAN (ipwho.is)
+            // Kelebihan: Limit lebih longgar & support HTTPS
+            const resBackup = await fetch('https://ipwho.is/');
+            if (!resBackup.ok) throw new Error("Backup Limit");
+            
+            const dataBackup = await resBackup.json();
+            
+            // Normalisasi data biar sesuai format UI kita
+            const cleanDataBackup = {
+                ip: dataBackup.ip,
+                city: dataBackup.city,
+                country_code: dataBackup.country_code,
+                org: dataBackup.connection?.isp || dataBackup.isp || "Unknown ISP"
+            };
+
+            setIpData(cleanDataBackup);
+            sessionStorage.setItem('sidiktaut_ip_cache', JSON.stringify(cleanDataBackup));
+            
+        } catch (finalError) {
+            // 4. JIKA KEDUANYA GAGAL (Sangat jarang)
             setIpData({ 
-                ip: 'Unavailable', 
-                city: 'Unknown', 
-                country_code: '-', 
-                org: 'Connection Limit/Error' 
+                ip: "Unavailable", 
+                city: "-", 
+                country_code: "-", 
+                org: "Connection Offline" 
             });
         }
+      }
     };
-    fetchIp();
+
+    fetchIpSmart();
   }, []);
 
   const copyIp = () => {
