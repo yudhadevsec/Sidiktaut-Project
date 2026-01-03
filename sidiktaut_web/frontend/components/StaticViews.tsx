@@ -78,7 +78,7 @@ export const BrowserView = memo(function BrowserView() {
         {/* --- LOGO CHROME ANIMATED --- */}
         <div className="absolute -right-10 -bottom-10 w-64 h-64 md:-right-12 md:-bottom-12 md:w-80 md:h-80 rotate-12 pointer-events-none z-0">
             <motion.img
-                src="/asset/chrome.png"
+                src="/chrome.png"
                 alt="Chrome Background"
                 initial={{ opacity: 0, scale: 0.8 }} 
                 animate={{ opacity: 0.1, scale: 1 }} 
@@ -193,7 +193,7 @@ export const CliView = memo(function CliView() {
          {/* BACKGROUND LOGOS */}
          <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}>
             <motion.img 
-                src="/asset/tux.png" 
+                src="/tux.png" 
                 alt="Tux Linux Background" 
                 initial={{ opacity: 0, scale: 0.8 }} 
                 animate={{ opacity: 0.15, scale: 1 }} 
@@ -204,7 +204,7 @@ export const CliView = memo(function CliView() {
 
          <div className={`${LOGO_CONFIG.python.mobile} ${LOGO_CONFIG.python.desktop} pointer-events-none select-none z-0`}>
             <motion.img 
-                src="/asset/python.png" 
+                src="/python.png" 
                 alt="Python Background" 
                 initial={{ opacity: 0, scale: 0.8 }} 
                 animate={{ opacity: 0.15, scale: 1 }} 
@@ -307,19 +307,19 @@ export const TeamView = memo(function TeamView() {
 
   const teamMembers = [
     {
-      name: 'Yudha Pratama', role: 'Lead Developer', image: '/asset/yudha.png',
+      name: 'Yudha Pratama', role: 'Lead Developer', image: '/yudha.png',
       short_desc: 'Cyber Security Student & Ethical Hacker.',
       full_desc: 'Sebagai Lead Developer, Saya bertanggung jawab atas keamanan sistem, integrasi API KEY, dan memastikan seluruh kode dan program memenuhi standar keamanan OWASP.',
       skills: ['Python', 'Security Code', 'Linux', 'Backend'], color: 'red'
     },
     {
-      name: 'Gyelgha Chonda', role: 'Extension Specialist', image: '/asset/chonda.jpg',
+      name: 'Gyelgha Chonda', role: 'Extension Specialist', image: '/chonda.jpg',
       short_desc: 'Browser Extension Architecture & Security.',
       full_desc: 'Spesialis dalam pengembangan Ekstensi Browser. Chonda merancang mekanisme "Right-Click Scan" dan memastikan ekstensi berjalan ringan (<5MB) tanpa membebani browser pengguna. Fokus pada efisiensi JavaScript dan Manifest V3.',
       skills: ['JavaScript', 'Chrome API', 'React', 'Optimization'], color: 'yellow'
     },
     {
-      name: 'Bram Lumozato M.', role: 'Front End Developer', image: '/asset/bram.jpg',
+      name: 'Bram Lumozato M.', role: 'Front End Developer', image: '/bram.jpg',
       short_desc: 'UI/UX Design & Responsive Layouts.',
       full_desc: 'Bertanggung jawab mengubah kode menjadi visual yang menawan. Bram memastikan antarmuka SidikTaut responsif di Mobile & Desktop, serta merancang pengalaman pengguna (UX) yang intuitif dan modern.',
       skills: ['React', 'Tailwind CSS', 'Figma', 'UI/UX'], color: 'green'

@@ -95,7 +95,7 @@ export default function App() {
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50 transition-colors duration-300">
          <div className="flex items-center gap-3">
             <img 
-              src="/asset/logo.png" 
+              src="/logo.png" 
               alt="Logo SidikTaut" 
               className="w-8 h-8 object-contain" 
             />
@@ -160,7 +160,7 @@ export default function App() {
               <div className="flex items-center gap-3 overflow-hidden">
                  <div className="shrink-0">
                     <img 
-                      src="/asset/logo.png" 
+                      src="/logo.png" 
                       alt="Logo SidikTaut" 
                       className="w-10 h-10 object-contain" 
                     />
