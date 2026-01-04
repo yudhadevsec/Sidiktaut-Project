@@ -81,6 +81,8 @@ export const BrowserView = memo(function BrowserView() {
             <StepItem number="4" title="Load Unpacked">Klik tombol <b>Load Unpacked</b>, pilih folder hasil ekstrak. SidikTaut siap untuk digunakan!</StepItem>
           </div>
         </div>
+        
+        {/* KOLOM KANAN (Persyaratan Sistem) */}
         <div className="space-y-6">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full"><Code size={20} /></div> Persyaratan Sistem</h3>
           <div className="bg-gray-50 dark:bg-[#121214] rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-800 h-fit shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
@@ -90,12 +92,7 @@ export const BrowserView = memo(function BrowserView() {
               <SpecItem label="Koneksi" value="Wajib Online (Internet)" />
               <SpecItem label="Versi Minimal" value="Chrome v88+" />
             </ul>
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl text-xs text-blue-700 dark:text-blue-300 leading-relaxed border border-blue-100 dark:border-blue-900/20">
-                <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                <p><b>Note:</b> Jangan lupa jalankan backend (app.py) agar ekstensi bisa berkomunikasi dengan server.</p>
-              </div>
-            </div>
+            {/* BAGIAN NOTE YANG DIHAPUS DARI SINI */}
           </div>
         </div>
       </div>
