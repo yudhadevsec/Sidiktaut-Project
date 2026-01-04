@@ -120,8 +120,8 @@ export const CliView = memo(function CliView() {
       <div className="bg-[#1a1a1a] dark:bg-black rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-5 md:gap-8 border border-gray-800 relative overflow-hidden">
          
          {/* Background Logos (Posisi disesuaikan sedikit agar pas dengan box yang makin pendek) */}
-         <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}><motion.img src="/tux.png" alt="Tux Linux" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.4 }} className="w-full h-full object-contain brightness-200 contrast-50" /></div>
-         <div className={`${LOGO_CONFIG.python.mobile} ${LOGO_CONFIG.python.desktop} pointer-events-none select-none z-0`}><motion.img src="/python.png" alt="Python" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200 contrast-50" /></div>
+         <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}><motion.img src="/tux.png" alt="Tux Linux" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }} className="w-full h-full object-contain brightness-200 contrast-50" /></div>
+         <div className={`${LOGO_CONFIG.python.mobile} ${LOGO_CONFIG.python.desktop} pointer-events-none select-none z-0`}><motion.img src="/python.png" alt="Python" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200 contrast-50" /></div>
          
          {/* Content Kiri */}
          <div className="flex-1 relative z-10 w-full">
