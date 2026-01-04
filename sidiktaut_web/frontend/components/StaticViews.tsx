@@ -56,7 +56,7 @@ export const BrowserView = memo(function BrowserView() {
           <PrimaryBtn icon={Download} label="Download .ZIP" onClick={handleDownloadZip} />
         </div>
         <div className="absolute -right-10 -bottom-10 w-64 h-64 md:-right-12 md:-bottom-12 md:w-80 md:h-80 rotate-12 pointer-events-none z-0">
-            <motion.img src="/chrome.png" alt="Chrome Background" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.1, scale: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200" />
+            <motion.img src="/chrome.png" alt="Chrome Background" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.1, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200" />
         </div>
       </div>
 
