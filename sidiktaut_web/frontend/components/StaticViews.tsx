@@ -87,7 +87,7 @@ export const BrowserView = memo(function BrowserView() {
           <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full"><Code size={20} /></div> Persyaratan Sistem</h3>
           <div className="bg-gray-50 dark:bg-[#121214] rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-800 h-fit shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <ul className="space-y-4">
-              <SpecItem label="Browser Support" value="Chrome, Edge, Brave, Opera" />
+              <SpecItem label="Browser Support" value="Chrome, Edge, Brave, Opera, Safari" />
               <SpecItem label="OS Support" value="Windows, macOS, Linux" />
               <SpecItem label="Koneksi" value="Wajib Online (Internet)" />
               <SpecItem label="Versi Minimal" value="Chrome v88+" />
