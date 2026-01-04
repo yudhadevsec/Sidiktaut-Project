@@ -182,8 +182,8 @@ def scan_url(target_url, is_detailed=False, allow_submit=True, output_file=None,
             report.append(f"SIDIKTAUT FORENSIC REPORT")
             report.append("="*60)
             report.append(f"Scan Date     : {time.ctime()}")
-            report.append(f"Scan ID       : {data['data']['id']}")  # [RESTORED]
-            report.append(f"Input URL     : {target_url}")           # [RESTORED]
+            report.append(f"Scan ID       : {data['data']['id']}")
+            report.append(f"Input URL     : {target_url}")          
             report.append(f"Final URL     : {real_target}")
             
             if redirect_hops:
