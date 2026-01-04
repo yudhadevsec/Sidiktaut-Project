@@ -36,7 +36,6 @@ function FeatureCard({ icon: Icon, title, desc }: any) {
 // --- BROWSER EXTENSION VIEW (OPTIMIZED) ---
 // PERBAIKAN: Menggunakan div biasa (bukan motion.div) untuk menghindari animasi ganda penyebab lag
 export const BrowserView = memo(function BrowserView() {
-  const handleDownloadReadme = () => { const link = document.createElement('a'); link.href = '/README.md'; link.download = 'README.md'; link.click(); };
   const handleDownloadZip = () => { const link = document.createElement('a'); link.href = '/sidiktaut-ext.zip'; link.download = 'sidiktaut-ext.zip'; link.click(); };
 
   return (
@@ -55,7 +54,6 @@ export const BrowserView = memo(function BrowserView() {
         </div>
         <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0">
           <PrimaryBtn icon={Download} label="Download .ZIP" onClick={handleDownloadZip} />
-          <SecondaryBtn icon={FileText} label="README.md" onClick={handleDownloadReadme} />
         </div>
         <div className="absolute -right-10 -bottom-10 w-64 h-64 md:-right-12 md:-bottom-12 md:w-80 md:h-80 rotate-12 pointer-events-none z-0">
             <motion.img src="/chrome.png" alt="Chrome Background" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.1, scale: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200" />
@@ -112,7 +110,6 @@ export const CliView = memo(function CliView() {
     tux: { mobile: "absolute bottom-[290px] right-[10px] w-[130px] h-[110px] rotate-[5deg]", desktop: "md:absolute md:top-[130px] md:-translate-y-[40px] md:right-[330px] md:w-56 md:h-56 md:rotate-[6deg]" },
     python: { mobile: "absolute bottom-[-21px] right-[-30px] w-[270px] h-[270px] rotate-[5deg]", desktop: "md:absolute md:top-1/2 md:-translate-y-1/2 md:-right-10 md:w-[400px] md:h-[400px] md:rotate-[5deg]" }
   };
-  const handleDownloadReadme = () => { const link = document.createElement('a'); link.href = '/README.md'; link.download = 'README.md'; link.click(); };
   const handleDownloadCli = () => { const link = document.createElement('a'); link.href = '/sidiktaut-cli.zip'; link.download = 'sidiktaut-cli.zip'; link.click(); };
   const copyInstall = () => { navigator.clipboard.writeText('python sidiktaut.py'); setInstallCopied(true); setTimeout(() => setInstallCopied(false), 2000); }
 
@@ -130,7 +127,6 @@ export const CliView = memo(function CliView() {
             <p className="text-gray-400 text-sm md:text-lg leading-relaxed max-w-xl mb-6 md:mb-8">Tools forensik URL via terminal. Dilengkapi fitur <b>Trace Redirect</b> dan <b>Auto Logging</b> untuk analisis mendalam.</p>
             <div className="flex flex-wrap gap-3">
                 <PrimaryBtn icon={Download} label="Download .ZIP" onClick={handleDownloadCli} className="bg-amber-600 text-white hover:bg-amber-700 border-none shadow-[0_4px_14px_0_rgba(245,158,11,0.2)]" />
-                <SecondaryBtn icon={FileDown} label="README.md" onClick={handleDownloadReadme} className="border-gray-700 hover:bg-gray-800"/>
             </div>
          </div>
          <div className="relative z-10 w-full md:w-auto md:min-w-[320px] mt-8 md:mt-0">
