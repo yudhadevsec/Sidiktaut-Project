@@ -11,51 +11,52 @@ import hashlib
 import re
 from urllib.parse import urljoin, urlparse
 
-# Load environment variables
+# Load .env
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+# API Key & URL VirusTotal
 VT_API_KEY = os.getenv("VT_API_KEY") 
 VT_URL = "https://www.virustotal.com/api/v3/urls"
 
-# User-Agent Global (Penting untuk menembus proteksi bot sederhana)
+# biar keliatan kayak browser (hindari blokir)
 HEADERS_UA = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Referer': 'https://www.google.com/'
 }
-
-# --- HELPER FUNCTIONS ---
 def is_safe_url(url):
+    # Cek format url
     if len(url) > 2000: return False
     pattern = r"^[a-zA-Z0-9-._~:/?#[\]@!$&'*+,;=%]+$"
     if not re.match(pattern, url): return False
     return True
 
 def resolve_protocol(raw_url):
-    # Bersihkan spasi
+    # tambahkan protokol http/https kalau ga ada
     raw_url = raw_url.strip()
     if raw_url.startswith("http://") or raw_url.startswith("https://"):
         return raw_url
     try:
-        # Coba tebak HTTPS dulu dengan User-Agent (PENTING!)
+        # Coba HTTPS dulu
         test_url = f"https://{raw_url}"
         response = requests.head(test_url, timeout=5, allow_redirects=True, headers=HEADERS_UA)
         if response.status_code < 400: return test_url
     except:
         pass
     
-    # Fallback ke HTTP jika HTTPS gagal total
+    # Kalau gagal, pakai HTTP
     return f"http://{raw_url}"
 
 def trace_redirects(url):
     """
-    TRACE LEVEL: SMART FILTER
+    Lacak redirect (pindah halaman) sampai tujuan akhir
     """
     session = requests.Session()
     session.headers.update(HEADERS_UA)
 
+    #Domain/format yang di-skip
     IGNORE_DOMAINS = [
         "google.com", "facebook.com", "twitter.com", "instagram.com", "tiktok.com", 
         "googleapis.com", "gstatic.com", "googletagmanager.com", "cdnjs.cloudflare.com", 
@@ -70,15 +71,19 @@ def trace_redirects(url):
         try:
             response = session.get(current_url, timeout=10, allow_redirects=True)
             
+            #Simpan history redirect
             if response.history:
                 for resp in response.history:
                     chain.append({"status": resp.status_code, "url": resp.url})
             
             chain.append({"status": response.status_code, "url": response.url})
             
+            # Kalau error, stop
             if response.status_code >= 400: break
 
             content_type = response.headers.get('Content-Type', '').lower()
+
+            # Skip file statis
             if any(t in content_type for t in ['javascript', 'json', 'css', 'image', 'font']):
                 if len(chain) > 1: chain.pop()
                 break
@@ -88,10 +93,13 @@ def trace_redirects(url):
             lower_content = content.lower()
             next_url = None
 
+            # Cari redirect via meta/JS
             meta = re.findall(r'content=["\']\d+;\s*url=([^"\']+)["\']', lower_content)
             js_loc = re.findall(r'location(?:\.href)?\s*=\s*["\'](http[^"\']+)["\']', content)
             
             candidates = js_loc + meta
+
+            # Kalau ga ada, ambil link <a> (sebagian saja)
             if not candidates:
                  raw_links = re.findall(r'<a[^>]+href=["\'](http[^"\']+)["\']', content)
                  candidates.extend(raw_links[:3])
@@ -109,11 +117,13 @@ def trace_redirects(url):
                 next_url = link
                 found_next = True
                 
+                # Cek masih satu domain atau bukan
                 if len(url.split('/')) > 2 and len(link.split('/')) > 2:
                     if url.split('/')[2] not in link: break 
             
             if not found_next: break
 
+            # Lanjut ke link berikutnya
             if next_url:
                 if not next_url.startswith('http'): next_url = urljoin(response.url, next_url)
                 if next_url == current_url: break
@@ -131,19 +141,20 @@ def scan_url():
     data = request.json
     raw_input = data.get('url')
 
+    # 👉 Validasi input
     if not raw_input: return jsonify({"error": "URL is required"}), 400
     if not is_safe_url(raw_input): return jsonify({"error": "Invalid URL format!"}), 400
     api_key = VT_API_KEY
     if not api_key: return jsonify({"error": "Server Configuration Error"}), 500
 
     try:
-        # 1. Resolve Protocol (Fix: Sekarang pakai Header, jadi klikbca/game3rb akan terdeteksi HTTPS)
+        # 👉 Tentukan protokol (http/https)
         initial_url = resolve_protocol(raw_input)
         
-        # 2. Trace Redirect (Hanya ambil datanya)
+        # 👉 Lacak redirect
         final_dest, redirect_chain = trace_redirects(initial_url)
         
-        # 3. KUNCI SCAN ke Initial URL
+        # 👉 Yang discan = URL awal
         target_url = initial_url 
         
         url_id_api = base64.urlsafe_b64encode(target_url.encode()).decode().strip("=")
@@ -155,10 +166,12 @@ def scan_url():
         except:
             return jsonify({"error": "Koneksi server bermasalah"}), 503
 
+        # 👉 Belum ada di database → kirim untuk scan
         if vt_response.status_code == 404:
             requests.post(VT_URL, data={"url": target_url}, headers=headers, timeout=15)
             return jsonify({"status": "pending", "message": "Analyzing...", "redirects": redirect_chain})
             
+        # 👉 Error API
         if vt_response.status_code >= 400:
             return jsonify({"error": f"API Error: {vt_response.status_code}"}), vt_response.status_code
 
@@ -172,9 +185,11 @@ def scan_url():
         harmless = stats.get('harmless', 0)
         undetected = stats.get('undetected', 0)
         
+        # 👉 Hitung nilai “trust”
         trust_score = 100 - (malicious * 20) - (suspicious * 10) if total > 0 else 0
         if trust_score < 0: trust_score = 0
 
+        # 👉 WHOIS (umur domain, dll)
         whois_data = None
         try:
             domain = target_url.replace("https://", "").replace("http://", "").split('/')[0]
@@ -189,9 +204,10 @@ def scan_url():
         except:
             pass
 
+        # 👉 Output akhir
         return jsonify({
-            "url": target_url,          # URL yang dikembalikan sudah HTTPS (jika server support)
-            "final_dest": final_dest,   
+            "url": target_url,
+            "final_dest": final_dest,
             "redirects": redirect_chain,
             "malicious": malicious,
             "harmless": harmless,
