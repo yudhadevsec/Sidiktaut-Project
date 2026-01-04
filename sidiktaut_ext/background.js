@@ -6,16 +6,26 @@ const API_ENDPOINT = "https://yudhadevsec.pythonanywhere.com/scan";
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "sidiktaut_manual",
+    id: "sidiktaut_scan_link",
     title: "🛡️ Scan Link Ini",
-    contexts: ["page", "link"]
+    contexts: ["link"]
   });
+});
+
+chrome.contextMenus.onClicked.addListener((info) => {
+  console.log("Menu clicked:", info);
+
+  if (info.menuItemId === "sidiktaut_scan_link" && info.linkUrl) {
+    performScanAndNotify(info.linkUrl);
+  }
+});
+
 
   chrome.storage.sync.get(["sidik_auto_scan", "sidik_ask_scan"], (res) => {
     if (res.sidik_auto_scan === undefined) chrome.storage.sync.set({ sidik_auto_scan: false });
     if (res.sidik_ask_scan === undefined) chrome.storage.sync.set({ sidik_ask_scan: true });
   });
-});
+  
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url && tab.url.startsWith("http")) {
