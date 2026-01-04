@@ -108,7 +108,7 @@ export const BrowserView = memo(function BrowserView() {
 export const CliView = memo(function CliView() {
   const [installCopied, setInstallCopied] = useState(false); 
   const LOGO_CONFIG = {
-    tux: { mobile: "absolute bottom-[180px] right-[10px] w-[100px] h-[90px] rotate-[5deg]", desktop: "md:absolute md:top-[130px] md:-translate-y-[40px] md:right-[330px] md:w-56 md:h-56 md:rotate-[6deg]" },
+    tux: { mobile: "absolute bottom-[265px] right-[15px] w-[100px] h-[90px] rotate-[5deg]", desktop: "md:absolute md:top-[130px] md:-translate-y-[40px] md:right-[330px] md:w-56 md:h-56 md:rotate-[6deg]" },
     python: { mobile: "absolute bottom-[-10px] right-[-20px] w-[200px] h-[200px] rotate-[5deg]", desktop: "md:absolute md:top-1/2 md:-translate-y-1/2 md:-right-10 md:w-[400px] md:h-[400px] md:rotate-[5deg]" }
   };
   const handleDownloadCli = () => { const link = document.createElement('a'); link.href = '/sidiktaut-cli.zip'; link.download = 'sidiktaut-cli.zip'; link.click(); };
@@ -167,9 +167,9 @@ export const CliView = memo(function CliView() {
                 <iframe className="w-full h-full" src="https://www.youtube.com/embed/EKdWnPgZkxY" title="Tutorial Penggunaan CLI" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"></iframe>
             </div>
             <div className="space-y-3 md:space-y-4">
-               <CodeBlock title="Standard Scan" cmd="python sidiktaut.py -u google.com" />
-               <CodeBlock title="Deep Scan & Save Log" cmd="python sidiktaut.py -u target.com -d -o report.txt" />
-               <CodeBlock title="Interactive Mode" cmd="python sidiktaut.py" />
+               <CodeBlock title="scan standar" cmd="python sidiktaut.py -u google.com" />
+               <CodeBlock title="Scan mendalam dan Simpan Log" cmd="python sidiktaut.py -u target.com -d -o report.txt" />
+               <CodeBlock title="Mode Interaktif" cmd="python sidiktaut.py" />
             </div>
          </div>
          <div className="space-y-4 md:space-y-6">
@@ -178,7 +178,7 @@ export const CliView = memo(function CliView() {
                <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                      <thead className="bg-gray-50 dark:bg-white/5 text-gray-500 font-bold uppercase text-[10px] md:text-xs">
-                        <tr><th className="px-4 py-3 md:px-6 md:py-4">Flag</th><th className="px-4 py-3 md:px-6 md:py-4">Description</th></tr>
+                        <tr><th className="px-4 py-3 md:px-6 md:py-4">Opsi</th><th className="px-4 py-3 md:px-6 md:py-4">Deskripsi</th></tr>
                      </thead>
                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         <ArgRow flag="-u, --url" desc="URL target scan" />
@@ -195,13 +195,51 @@ export const CliView = memo(function CliView() {
 });
 
 // --- TEAM VIEW (ANIMATED) ---
+// --- TEAM VIEW (ANIMATED & UPDATED SOCIALS) ---
 export const TeamView = memo(function TeamView() {
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  
+  // UPDATE DATA LINK DI SINI
   const teamMembers = [
-    { name: 'Yudha Pratama', role: 'Lead Developer', image: '/yudha.png', short_desc: 'Cyber Security Student & Ethical Hacker.', full_desc: 'Sebagai Lead Developer, Saya bertanggung jawab atas keamanan sistem, integrasi API KEY, dan memastikan seluruh kode dan program memenuhi standar keamanan OWASP.', skills: ['Python', 'Security Code', 'Linux', 'Backend'], color: 'red' },
-    { name: 'Gyelgha Chonda', role: 'Extension Specialist', image: '/chonda.jpg', short_desc: 'Browser Extension Architecture & Security.', full_desc: 'Spesialis dalam pengembangan Ekstensi Browser. Chonda merancang mekanisme "Right-Click Scan" dan memastikan ekstensi berjalan ringan (<5MB) tanpa membebani browser pengguna. Fokus pada efisiensi JavaScript dan Manifest V3.', skills: ['JavaScript', 'Chrome API', 'React', 'Optimization'], color: 'yellow' },
-    { name: 'Bram Lumozato M.', role: 'Front End Developer', image: '/bram.jpg', short_desc: 'UI/UX Design & Responsive Layouts.', full_desc: 'Bertanggung jawab mengubah kode menjadi visual yang menawan. Bram memastikan antarmuka SidikTaut responsif di Mobile & Desktop, serta merancang pengalaman pengguna (UX) yang intuitif dan modern.', skills: ['React', 'Tailwind CSS', 'Figma', 'UI/UX'], color: 'green' }
+    { 
+      name: 'Yudha Pratama', 
+      role: 'Lead Developer', 
+      image: '/yudha.png', 
+      short_desc: 'Full Stack Engineer & Cyber Security Student.', 
+      full_desc: 'Arsitek utama di balik seluruh ekosistem SidikTaut. Merancang dan membangun sistem secara End-to-End, mulai dari logika forensik pada CLI (Python), keamanan API Backend, hingga antarmuka Web Modern.', 
+      skills: ['Full Stack', 'Python', 'React', 'Cyber Security'], 
+      color: 'red',
+      // Isi link kamu disini:
+      github: 'https://github.com/yudhadevsec', 
+      linkedin: 'https://linkedin.com/in/yudhadev-sec',
+      instagram: 'https://instagram.com/farazlogic'
+    },
+    { 
+      name: 'Gyelgha Chonda', 
+      role: 'Extension Quality Assurance', 
+      image: '/chonda.jpg', 
+      short_desc: 'Browser Extension Architecture.', 
+      full_desc: 'Berkontribusi pada konsep pengembangan Ekstensi Browser dan riset mengenai mekanisme integrasi Manifest V3 untuk pengalaman pengguna yang ringan.', 
+      skills: ['Research', 'Chrome API', 'Documentation'], 
+      color: 'yellow',
+      github: 'https://github.com/',
+      linkedin: '',
+      instagram: ''
+    },
+    { 
+      name: 'Bram Lumozato M.', 
+      role: 'Web Quality', 
+      image: '/bram.jpg', 
+      short_desc: 'User Interface Concept.', 
+      full_desc: 'Membantu dalam perancangan konsep visual awal dan layout antarmuka untuk memastikan kenyamanan penggunaan aplikasi.', 
+      skills: ['Design Concept', 'Layouting'], 
+      color: 'green',
+      github: '',
+      linkedin: '',
+      instagram: ''
+    }
   ];
+
   const transitionSettings = { duration: 0.3, ease: "easeInOut" };
   const detailVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
   const gridVariants = { hidden: { opacity: 0 }, visible: { opacity: 1 }, exit: { opacity: 0 } };
@@ -219,8 +257,18 @@ export const TeamView = memo(function TeamView() {
               <span className={`inline-block px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest mb-3 md:mb-4 bg-${selectedMember.color}-100 text-${selectedMember.color}-700 dark:bg-${selectedMember.color}-900/30 dark:text-${selectedMember.color}-400`}>{selectedMember.role}</span>
               <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 md:mb-6 tracking-tight">{selectedMember.name}</h1>
               <p className="text-sm md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-6 md:mb-8">{selectedMember.full_desc}</p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-3 mb-6 md:mb-8">{selectedMember.skills.map((skill: string) => (<span key={skill} className="px-4 py-2 md:px-5 md:py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-700 rounded-full text-[10px] md:text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide">{skill}</span>))}</div>
-              <div className="flex justify-center md:justify-start gap-3 md:gap-4"><SocialBtn icon={Github} label="GitHub" /><SocialBtn icon={Linkedin} label="LinkedIn" /></div>
+              
+              <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-3 mb-6 md:mb-8">
+                  {selectedMember.skills.map((skill: string) => (<span key={skill} className="px-4 py-2 md:px-5 md:py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-700 rounded-full text-[10px] md:text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide">{skill}</span>))}
+              </div>
+              
+              {/* BAGIAN TOMBOL SOSIAL MEDIA */}
+              <div className="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4">
+                {selectedMember.github && <SocialBtn icon={Github} label="GitHub" href={selectedMember.github} />}
+                {selectedMember.linkedin && <SocialBtn icon={Linkedin} label="LinkedIn" href={selectedMember.linkedin} />}
+                {selectedMember.instagram && <SocialBtn icon={Instagram} label="Instagram" href={selectedMember.instagram} />}
+              </div>
+
             </div>
           </div>
         </motion.div>
@@ -248,4 +296,14 @@ function StepItem({ number, title, children }: any) { return (<div className="fl
 function SpecItem({ label, value }: any) { return (<li className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4 border-b border-gray-200 dark:border-gray-700/50 pb-3 last:border-0 last:pb-0"><span className="text-gray-500 dark:text-gray-400 font-medium text-xs uppercase tracking-wide sm:normal-case sm:tracking-normal">{label}</span><span className="font-bold text-gray-900 dark:text-white text-sm sm:text-right">{value}</span></li>) }
 function CodeBlock({ title, cmd }: any) { const [isCopied, setIsCopied] = useState(false); const handleCopy = () => { navigator.clipboard.writeText(cmd); setIsCopied(true); setTimeout(() => setIsCopied(false), 2000); }; return (<div className="group"><p className="text-[10px] md:text-xs font-bold text-gray-400 mb-2 ml-2 uppercase tracking-wider">{title}</p><div className="bg-[#0a0a0a] rounded-2xl md:rounded-[1.5rem] border border-gray-800 p-4 md:p-5 font-mono text-xs md:text-sm text-amber-400 flex justify-between items-center hover:border-gray-600 transition-colors shadow-inner"><span className="break-all mr-2">{cmd}</span><div onClick={handleCopy} className="p-2 cursor-pointer transition-colors hover:text-white shrink-0">{isCopied ? <Check size={16} className="text-amber-500" /> : <Copy size={16} className="text-gray-600 group-hover:text-white" />}</div></div></div>) }
 function ArgRow({ flag, desc }: any) { return (<tr className="border-b border-gray-100 dark:border-gray-800/50 last:border-0 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"><td className="px-4 py-3 md:px-6 md:py-4 font-mono text-[10px] md:text-xs text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap">{flag}</td><td className="px-4 py-3 md:px-6 md:py-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm">{desc}</td></tr>) }
-function SocialBtn({ icon: Icon, label }: any) { return (<button className="flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white rounded-full font-bold text-xs md:text-sm hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all shadow-sm active:scale-95 border border-transparent"><Icon size={18} /> {label}</button>) }
+// Ganti function SocialBtn yang lama dengan ini:
+function SocialBtn({ icon: Icon, label, href }: any) { 
+  return (
+    <button 
+      onClick={() => href && window.open(href, '_blank')} 
+      className="flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white rounded-full font-bold text-xs md:text-sm hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all shadow-sm active:scale-95 border border-transparent cursor-pointer"
+    >
+      {Icon && <Icon size={18} />} {label}
+    </button>
+  ) 
+}
