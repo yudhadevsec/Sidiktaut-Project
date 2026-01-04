@@ -84,7 +84,7 @@ export default function App() {
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Scanner', icon: Shield },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard},
     { id: 'browser', label: 'Extension', icon: Globe },
     { id: 'cli', label: 'CLI Tool', icon: Terminal },
     { id: 'team', label: 'Tim Kami', icon: Users },
