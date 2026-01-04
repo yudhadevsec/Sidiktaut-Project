@@ -7,7 +7,7 @@ const API_ENDPOINT = "https://yudhadevsec.pythonanywhere.com/scan";
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "sidiktaut_scan_link",
-    title: "🛡️ Scan Link Ini",
+    title: "Scan Link Ini",
     contexts: ["link"]
   });
 });
