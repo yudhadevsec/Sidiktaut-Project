@@ -104,44 +104,62 @@ export const BrowserView = memo(function BrowserView() {
 });
 
 // --- CLI TOOL VIEW (OPTIMIZED) ---
+// --- CLI TOOL VIEW (OPTIMIZED & RE-LAYOUT) ---
 export const CliView = memo(function CliView() {
   const [installCopied, setInstallCopied] = useState(false); 
   const LOGO_CONFIG = {
-    tux: { mobile: "absolute bottom-[290px] right-[10px] w-[130px] h-[110px] rotate-[5deg]", desktop: "md:absolute md:top-[130px] md:-translate-y-[40px] md:right-[330px] md:w-56 md:h-56 md:rotate-[6deg]" },
-    python: { mobile: "absolute bottom-[-21px] right-[-30px] w-[270px] h-[270px] rotate-[5deg]", desktop: "md:absolute md:top-1/2 md:-translate-y-1/2 md:-right-10 md:w-[400px] md:h-[400px] md:rotate-[5deg]" }
+    tux: { mobile: "absolute bottom-[180px] right-[10px] w-[100px] h-[90px] rotate-[5deg]", desktop: "md:absolute md:top-[130px] md:-translate-y-[40px] md:right-[330px] md:w-56 md:h-56 md:rotate-[6deg]" },
+    python: { mobile: "absolute bottom-[-10px] right-[-20px] w-[200px] h-[200px] rotate-[5deg]", desktop: "md:absolute md:top-1/2 md:-translate-y-1/2 md:-right-10 md:w-[400px] md:h-[400px] md:rotate-[5deg]" }
   };
   const handleDownloadCli = () => { const link = document.createElement('a'); link.href = '/sidiktaut-cli.zip'; link.download = 'sidiktaut-cli.zip'; link.click(); };
   const copyInstall = () => { navigator.clipboard.writeText('python sidiktaut.py'); setInstallCopied(true); setTimeout(() => setInstallCopied(false), 2000); }
 
   return (
     <div className="space-y-6 md:space-y-8 pb-12">
-      <div className="bg-[#1a1a1a] dark:bg-black rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-8 md:gap-10 border border-gray-800 relative overflow-hidden min-h-[400px] md:min-h-[auto]">
+      {/* PERBAIKAN LAYOUT: 
+         1. min-h-[400px] dihapus agar tinggi menyesuaikan isi.
+         2. gap dikurangi dari 8/10 menjadi 5/8 agar elemen lebih rapat (social distancing dikurangi).
+      */}
+      <div className="bg-[#1a1a1a] dark:bg-black rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-5 md:gap-8 border border-gray-800 relative overflow-hidden">
+         
+         {/* Background Logos (Posisi disesuaikan sedikit agar pas dengan box yang makin pendek) */}
          <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}><motion.img src="/tux.png" alt="Tux Linux" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.4 }} className="w-full h-full object-contain brightness-200 contrast-50" /></div>
          <div className={`${LOGO_CONFIG.python.mobile} ${LOGO_CONFIG.python.desktop} pointer-events-none select-none z-0`}><motion.img src="/python.png" alt="Python" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200 contrast-50" /></div>
+         
+         {/* Content Kiri */}
          <div className="flex-1 relative z-10 w-full">
-            <div className="flex flex-wrap items-center gap-3 mb-4 md:mb-6">
+            <div className="flex flex-wrap items-center gap-3 mb-3 md:mb-5">
                <span className="px-3 py-1 bg-amber-900/20 text-amber-400 rounded-full text-[10px] md:text-xs font-bold border border-amber-800 flex items-center gap-2"><Terminal size={12}/> Versi 0.1</span>
                <span className="px-3 py-1 bg-gray-800 text-gray-400 rounded-full text-[10px] md:text-xs font-bold border border-gray-700">Python 3.9+</span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-4 md:mb-6 leading-tight">SidikTaut <span className="text-amber-500 font-mono">CLI</span></h1>
-            <p className="text-gray-400 text-sm md:text-lg leading-relaxed max-w-xl mb-6 md:mb-8">Tools forensik URL via terminal. Dilengkapi fitur <b>Trace Redirect</b> dan <b>Auto Logging</b> untuk analisis mendalam.</p>
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3 md:mb-5 leading-tight">SidikTaut <span className="text-amber-500 font-mono">CLI</span></h1>
+            <p className="text-gray-400 text-sm md:text-lg leading-relaxed max-w-xl mb-5 md:mb-6">Tools forensik URL via terminal. Dilengkapi fitur <b>Trace Redirect</b> dan <b>Auto Logging</b> untuk analisis mendalam.</p>
+            
+            {/* Tombol Download */}
             <div className="flex flex-wrap gap-3">
                 <PrimaryBtn icon={Download} label="Download .ZIP" onClick={handleDownloadCli} className="bg-amber-600 text-white hover:bg-amber-700 border-none shadow-[0_4px_14px_0_rgba(245,158,11,0.2)]" />
             </div>
          </div>
-         <div className="relative z-10 w-full md:w-auto md:min-w-[320px] mt-8 md:mt-0">
-            <p className="text-[10px] font-bold text-gray-500 mb-2 md:mb-3 uppercase tracking-wider ml-1">Run Program</p>
+
+         {/* Content Kanan (Run Program) */}
+         {/* PERBAIKAN: mt-8 dikurangi jadi mt-5 agar tidak terlalu jauh di mobile */}
+         <div className="relative z-10 w-full md:w-auto md:min-w-[320px] mt-5 md:mt-0">
+            <p className="text-[10px] font-bold text-gray-500 mb-2 md:mb-2 uppercase tracking-wider ml-1">Run Program</p>
             <div className="bg-black rounded-2xl md:rounded-[1.5rem] border border-gray-800 p-4 md:p-5 flex items-center justify-between group shadow-lg hover:border-amber-600 transition-colors w-full relative z-20">
                <code className="text-amber-400 font-mono text-xs md:text-sm truncate mr-2">$ python sidiktaut.py</code>
                <div onClick={copyInstall} className="p-2 hover:bg-gray-800 rounded-lg md:rounded-full cursor-pointer transition-colors shrink-0">{installCopied ? <Check size={16} className="text-amber-500"/> : <Copy size={16} className="text-gray-600 group-hover:text-white"/>}</div>
             </div>
          </div>
       </div>
+
+      {/* Grid Features */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <FeatureCard icon={Network} title="Trace Redirects" desc="Otomatis melacak jalur redirect link sebelum sampai ke tujuan akhir." />
         <FeatureCard icon={FileText} title="Deep Analysis" desc="Menampilkan detail deteksi dari setiap vendor antivirus (Mode -d)." />
         <FeatureCard icon={Download} title="Auto Logging" desc="Simpan hasil analisis forensik ke file text secara otomatis (Mode -o)." />
       </div>
+
+      {/* Bagian Bawah (Video & Arguments) tetap sama */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 pt-2 md:pt-4">
          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-full"><Play size={18} md:size={20}/></div> Contoh penggunaan</h3>
