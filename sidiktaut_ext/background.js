@@ -2,30 +2,19 @@
  * SIDIKTAUT BACKGROUND SERVICE
  */
 
-const API_ENDPOINT = "https://yudhadevsec.pythonanywhere.com/scan";
-
-// --- Event Listeners ---
+const API_ENDPOINT = "http://127.0.0.1:5000/scan";
 
 chrome.runtime.onInstalled.addListener(() => {
-  // Membuat Context Menu saat klik kanan
   chrome.contextMenus.create({
-    id: "sidiktaut_scan_link",
+    id: "sidiktaut_manual",
     title: "🛡️ Scan Link Ini",
-    contexts: ["link"]
+    contexts: ["page", "link"]
   });
 
-  // Set default settings jika belum ada
   chrome.storage.sync.get(["sidik_auto_scan", "sidik_ask_scan"], (res) => {
     if (res.sidik_auto_scan === undefined) chrome.storage.sync.set({ sidik_auto_scan: false });
     if (res.sidik_ask_scan === undefined) chrome.storage.sync.set({ sidik_ask_scan: true });
   });
-});
-
-chrome.contextMenus.onClicked.addListener((info) => {
-  console.log("Menu clicked:", info);
-  if (info.menuItemId === "sidiktaut_scan_link" && info.linkUrl) {
-    performScanAndNotify(info.linkUrl);
-  }
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
@@ -40,16 +29,14 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "REQUEST_SCAN") {
     handleScanRequest(request.url, sendResponse);
-    return true; // Return true untuk menandakan respon bersifat asinkron
+    return true;
   }
 });
-
-// --- Helper Functions ---
 
 async function handleScanRequest(url, sendResponse) {
   try {
     const data = await fetchScanData(url);
-    sendResponse({ success: true, data: data });
+    sendResponse({ success: true, data });
   } catch (error) {
     sendResponse({ success: false, error: error.message });
   }
@@ -62,7 +49,7 @@ async function fetchScanData(url) {
       "Content-Type": "application/json",
       "X-CLIENT-ID": "sidiktaut-extension"
     },
-    body: JSON.stringify({ url: url })
+    body: JSON.stringify({ url })
   });
 
   if (!response.ok) throw new Error("Gagal terhubung ke Backend (Cek app.py)");
@@ -70,7 +57,6 @@ async function fetchScanData(url) {
 }
 
 async function performScanAndNotify(url) {
-  // PERBAIKAN: Menambahkan backtick (`) yang hilang
   const notifId = `scan-${Date.now()}`;
 
   chrome.notifications.create(notifId, {
@@ -89,13 +75,12 @@ async function performScanAndNotify(url) {
     const malicious = data.malicious || 0;
     const isSafe = malicious === 0;
 
-    // PERBAIKAN: Menambahkan backtick (`) untuk template literals
     chrome.notifications.create({
       type: "basic",
       iconUrl: "icon.png",
       title: isSafe ? "✅ Link Aman" : "⚠️ BAHAYA TERDETEKSI",
-      message: isSafe 
-        ? `Reputasi: ${data.reputation}/100. Aman.` 
+      message: isSafe
+        ? `Reputasi: ${data.reputation}/100. Aman.`
         : `Ditemukan ${malicious} ancaman berbahaya!`,
       priority: 2,
       requireInteraction: !isSafe
@@ -106,3 +91,8 @@ async function performScanAndNotify(url) {
     console.error(error);
   }
 }
+
+chrome.contextMenus.onClicked.addListener((info) => {
+  const url = info.linkUrl || info.pageUrl;
+  if (url) performScanAndNotify(url);
+});
