@@ -15,8 +15,8 @@ const THREAT_MAP: Record<string, string> = {
   'default_bad': '⚠️ BAHAYA: Terdeteksi mencurigakan.',
 };
 
-// 2. Ubah nama fungsi jadi internal (hapus export default di depan)
-function ScannerComponent() {
+// [TAMBAHAN] Terima props onModalChange dari App.tsx
+function ScannerComponent({ onModalChange }: any) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,6 +36,13 @@ function ScannerComponent() {
   
   const [showTrace, setShowTrace] = useState(false);
   const [result, setResult] = useState<ScanResponse | any>(null);
+
+  // [TAMBAHAN] Logic: Kirim sinyal ke App saat modal dibuka/tutup
+  useEffect(() => {
+    if (onModalChange) {
+        onModalChange(showModal);
+    }
+  }, [showModal, onModalChange]);
 
   // MEMBUAT LIST GAMBAR DARI REDIRECTS
   const previewList = useMemo(() => {
@@ -440,7 +447,9 @@ function ScannerComponent() {
       <AnimatePresence>
       {showModal && result && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-           <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="bg-white dark:bg-[#121214] w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border border-gray-100 dark:border-gray-800">
+           
+           {/* [PERBAIKAN 2] Ubah rounded-[3rem] (48px) jadi rounded-3xl (24px) agar tidak ekstrim */}
+           <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="bg-white dark:bg-[#121214] w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border border-gray-100 dark:border-gray-800">
               <div className="p-6 border-b border-gray-100 dark:border-gray-800 shrink-0 flex justify-between items-center bg-gray-50/50 dark:bg-white/5">
                  <h3 className="font-black text-xl dark:text-white flex items-center gap-2"><Shield size={20} className="text-blue-500"/> Scan Details</h3>
                  <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full"><X size={24} className="text-gray-500"/></button>
@@ -448,38 +457,18 @@ function ScannerComponent() {
               
               {!selectedDetail && (
                 <div className="px-6 pt-4 shrink-0">
-                  {/* Container Tab Abu-abu */}
-                  <div className="flex p-1 bg-gray-100 dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800">
-                    {(['malicious', 'harmless', 'undetected'] as const).map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveFilter(tab)}
-                        className={`
-                          flex-1 py-2 rounded-lg text-xs font-semibold capitalize transition-all flex items-center justify-center gap-1.5
-                          ${activeFilter === tab
-                            ? 'bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-white shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                          }
-                        `}
-                      >
-                        {/* Label Kategori */}
-                        {tab}
-
-                        {/* Badge Angka (Counter) */}
-                        <span className={`
-                          px-1.5 py-0.5 rounded-[5px] text-[10px] leading-none
-                          ${activeFilter === tab
-                            ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white'
-                            : 'bg-gray-200 dark:bg-white/5 text-gray-500 dark:text-gray-400'
-                          }
-                        `}>
-                          {result[tab] || 0}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
+                   
+                   {/* [PERBAIKAN 1] Ganti 'flex' jadi 'grid grid-cols-3' agar tombol malicious/harmless rapi dan tidak acak-acakan */}
+                   <div className="grid grid-cols-3 gap-1 p-1 bg-gray-100 dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800">
+                     {(['malicious', 'harmless', 'undetected'] as const).map((tab) => (
+                        <button key={tab} onClick={() => setActiveFilter(tab)} className={`py-2 rounded-lg text-[10px] md:text-xs font-bold capitalize transition-all flex flex-col md:flex-row items-center justify-center gap-1 ${activeFilter === tab ? 'bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>
+                           {tab} <span className={`px-1.5 py-0.5 rounded-[5px] text-[10px] leading-none ${activeFilter === tab ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white' : 'bg-gray-200 dark:bg-white/5 text-gray-500 dark:text-gray-400'}`}>{result[tab] || 0}</span>
+                        </button>
+                     ))}
+                   </div>
                 </div>
               )}
+
               <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
                    {selectedDetail ? (
                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
@@ -495,14 +484,9 @@ function ScannerComponent() {
                    ) : (
                      <div className="space-y-3">
                         {filteredDetails.length > 0 ? filteredDetails.map((item: any, idx: number) => (
-                             <button 
-                                key={idx} 
-                                onClick={() => setSelectedDetail(item)} 
-                                className={`w-full p-4 rounded-2xl border text-left flex justify-between items-center transition-colors group shadow-[0_2px_8px_rgb(0,0,0,0.02)] ${getRowStyle(item.category)}`}
-                             >
+                             <button key={idx} onClick={() => setSelectedDetail(item)} className={`w-full p-4 rounded-2xl border text-left flex justify-between items-center transition-colors group shadow-[0_2px_8px_rgb(0,0,0,0.02)] ${getRowStyle(item.category)}`}>
                                 <span className="font-bold text-sm flex items-center gap-3 text-gray-900 dark:text-white">
-                                    <CheckCircle size={16} className={`text-gray-400 ${item.category === 'malicious' ? 'text-red-500' : (item.category === 'harmless' ? 'text-green-500' : 'text-gray-400')}`}/> 
-                                    {item.engine_name}
+                                    <CheckCircle size={16} className={`text-gray-400 ${item.category === 'malicious' ? 'text-red-500' : (item.category === 'harmless' ? 'text-green-500' : 'text-gray-400')}`}/> {item.engine_name}
                                 </span>
                                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/50 dark:bg-black/20 text-gray-900 dark:text-white">{item.result}</span>
                              </button>

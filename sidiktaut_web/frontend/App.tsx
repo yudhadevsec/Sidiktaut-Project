@@ -9,6 +9,9 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
   
+  // [TAMBAHAN] State untuk animasi Navbar Slide Up
+  const [hideMobileNav, setHideMobileNav] = useState(false);
+
   // --- DARK MODE LOGIC ---
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -103,8 +106,12 @@ export default function App() {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-white font-sans overflow-hidden transition-colors duration-300 ease-in-out">
       
-      {/* MOBILE HEADER */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50 transition-colors duration-300">
+      {/* MOBILE HEADER - [UBAH] Jadi motion.div agar bisa animasi tarik ke atas */}
+      <motion.div 
+         animate={{ y: hideMobileNav ? "-100%" : "0%" }}
+         transition={{ duration: 0.3, ease: "easeInOut" }}
+         className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50"
+      >
          <div className="flex items-center gap-3">
             <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
             <div className="flex flex-col justify-center">
@@ -113,7 +120,7 @@ export default function App() {
             </div>
          </div>
          <button onClick={() => setMobileMenuOpen(true)} className="p-2"><Menu size={24}/></button>
-      </div>
+      </motion.div>
 
       {/* MOBILE DRAWER */}
       <AnimatePresence>
@@ -180,10 +187,11 @@ export default function App() {
          <div className="max-w-6xl mx-auto min-h-[90vh] flex flex-col relative z-10">
             <div className="flex-1">
                <AnimatePresence mode="wait">
-                   {/* PERBAIKAN: Hapus class 'gpu-mode' yang bikin layar hitam */}
                    {activeView === 'dashboard' && (
                      <motion.div key="dashboard" {...pageTransition} className="space-y-8">
-                       <Scanner />
+                       {/* [TAMBAHAN] Kirim props 'setHideMobileNav' ke Scanner */}
+                       <Scanner onModalChange={setHideMobileNav} />
+                       
                        <div>
                           <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 text-sm uppercase tracking-wider mb-4 px-1"><Wifi size={18} className="text-blue-500"/> Identitas Koneksi Anda</h3>
                           <div className="bg-white dark:bg-[#121214] p-6 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col md:flex-row gap-6">
