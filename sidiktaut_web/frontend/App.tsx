@@ -109,8 +109,9 @@ export default function App() {
       {/* MOBILE HEADER - [UBAH] Jadi motion.div agar bisa animasi tarik ke atas */}
       <motion.div 
          animate={{ y: hideMobileNav ? "-100%" : "0%" }}
-         transition={{ duration: 0.3, ease: "easeInOut" }}
-         className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50"
+         // Gunakan transisi ini agar selaras dengan drawer
+         transition={{ type: "spring", stiffness: 260, damping: 20 }}
+         className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50 shadow-sm"
       >
          <div className="flex items-center gap-3">
             <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
@@ -123,27 +124,46 @@ export default function App() {
       </motion.div>
 
       {/* MOBILE DRAWER */}
+      {/* MOBILE DRAWER (OPTIMIZED 120FPS FEEL) */}
       <AnimatePresence>
       {mobileMenuOpen && (
         <>
-        <div className="fixed inset-0 z-[60] bg-black/60 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+        {/* 1. OVERLAY BACKGROUND (Sekarang ada animasinya) */}
         <motion.div 
-            initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "tween", duration: 0.3 }} 
-            className="fixed top-0 right-0 z-[70] w-64 h-full bg-white dark:bg-[#121214] border-l border-gray-100 dark:border-gray-800 flex flex-col md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }} // Fade cepat tapi halus
+            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden" 
+            onClick={() => setMobileMenuOpen(false)} 
+        />
+        
+        {/* 2. SIDEBAR PANEL (Menggunakan Spring Physics) */}
+        <motion.div 
+            initial={{ x: "100%" }} 
+            animate={{ x: "0%" }} 
+            exit={{ x: "100%" }} 
+            transition={{ 
+                type: "spring", 
+                stiffness: 300, // Kekakuan pegas (makin tinggi makin responsif)
+                damping: 30,    // Redaman (biar tidak memantul berlebihan)
+                mass: 1         // Berat objek
+            }} 
+            className="fixed top-0 right-0 z-[70] w-64 h-full bg-white dark:bg-[#121214] border-l border-gray-100 dark:border-gray-800 flex flex-col md:hidden shadow-2xl"
         >
             <div className="flex justify-between items-center p-5 border-b border-gray-100 dark:border-gray-800">
                 <span className="font-bold text-lg text-gray-900 dark:text-white">Menu</span>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400"><X size={20}/></button>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 active:scale-90 transition-transform"><X size={20}/></button>
             </div>
             <nav className="flex-1 overflow-y-auto p-4 space-y-2">
                 {menuItems.map(item => (
-                <button key={item.id} onClick={() => handleNavClick(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold ${activeView === item.id ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}>
+                <button key={item.id} onClick={() => handleNavClick(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${activeView === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}>
                     <item.icon size={18} /> {item.label}
                 </button>
                 ))}
             </nav>
             <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0A0C]">
-                <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-white dark:bg-[#121214] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
+                <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-white dark:bg-[#121214] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white active:scale-95 transition-transform shadow-sm">
                 {darkMode ? <Sun size={18} className="text-amber-500"/> : <Moon size={18} className="text-blue-500"/>} {darkMode ? 'Light Mode' : 'Dark Mode'}
                 </button>
             </div>
