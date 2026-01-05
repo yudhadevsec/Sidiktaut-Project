@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "SidikTaut - Link Analyzer",
-  "version": "4.1",
-  "description": "Analisis keamanan link menggunakan VirusTotal API.",
+  "name": "SidikTaut Extension- Link Analyzer",
+  "version": "0.1",
+  "description": "Ekstensi ringan untuk Chrome atau browser favoritmu. Analisis Satset tanpa Ribet.",
   "permissions": [
     "activeTab",
     "tabs",
