@@ -2,9 +2,10 @@ name: Sync Backend to Hugging Face
 
 on:
   push:
-    branches: [main] # atau 'master', cek branch kamu apa
+    branches: [main]
     paths:
-      - 'backend/**' # Robot cuma jalan kalau folder backend berubah
+      # Robot hanya jalan kalau file di dalam folder ini berubah
+      - 'sidiktaut_web/backend/**'
 
 jobs:
   sync-to-hub:
@@ -19,7 +20,9 @@ jobs:
       - name: Push to Hugging Face Space
         uses: nader-sl/huggingface-sync@v0.0.1
         with:
-          # GANTI USERNAME DAN NAMA SPACE KAMU DI BAWAH INI:
+          # Pastikan ini sesuai: usernameHF/NamaSpace
           repository: 'yudhadevsec/Sidiktaut' 
           token: ${{ secrets.HF_TOKEN }}
+          
+          # INI KUNCINYA: Kita suruh dia masuk ke dalam folder sidiktaut_web dulu
           directory: './sidiktaut_web/backend'
