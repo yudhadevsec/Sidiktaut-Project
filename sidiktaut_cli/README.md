@@ -1,6 +1,5 @@
 # Sidiktaut CLI v.0.1
-
-Tools analisis link berbasis terminal untuk mendeteksi ancaman dari link berbahaya, melacak pengalihan dengan shortlink (redirect), dan menghasilkan laporan yang detail (Full Report)
+Tools forensik URL via terminal. Dilengkapi fitur Trace Redirect dan Auto Logging untuk analisis mendalam.
 
 ## Fitur Utama
 - **Pelacakan Shortlink & Redirect**: Membongkar bit.ly/shortlink sampai ke akar.
