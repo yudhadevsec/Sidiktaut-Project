@@ -16,22 +16,28 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Push to Hugging Face Space
-        uses: nateraw/huggingface-sync-action@v0.0.5
-        with:
-          # --- PERHATIKAN BAGIAN INI (BEDA DARI SEBELUMNYA) ---
+      - name: Push to Hugging Face Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # 1. Konfigurasi Git (Pura-pura jadi Robot)
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
+
+          # 2. Clone Space Hugging Face (Target)
+          # Menggunakan token kamu untuk login otomatis
+          git clone https://yudhadevsec:$HF_TOKEN@huggingface.co/spaces/yudhadevsec/Sidiktaut hf_space
+
+          # 3. Pindah File
+          # Masuk ke folder hasil clone tadi
+          cd hf_space
           
-          # 1. Wajib isi nama Repo GitHub kamu (Lihat dari screenshot kamu)
-          github_repo_id: 'yudhadevsec/Sidiktaut-Project'
+          # Copy SEMUA isi folder backend dari GitHub ke sini
+          # (Perintah cp -a akan mengcopy file hidden juga jika ada)
+          cp -a ../sidiktaut_web/backend/. .
           
-          # 2. Nama Repo Hugging Face Tujuan
-          huggingface_repo_id: 'yudhadevsec/Sidiktaut'
-          
-          # 3. Jenis Repo (Space)
-          repo_type: 'space'
-          
-          # 4. Token (Namanya jadi hf_token)
-          hf_token: ${{ secrets.HF_TOKEN }}
-          
-          # 5. Folder yang mau dikirim (Namanya jadi subdirectory)
-          subdirectory: 'sidiktaut_web/backend'
+          # 4. Eksekusi Push
+          echo "Persiapan push ke Hugging Face..."
+          git add .
+          git commit -m "Sync from GitHub: $GITHUB_SHA" || echo "Tidak ada perubahan baru."
+          git push origin main
