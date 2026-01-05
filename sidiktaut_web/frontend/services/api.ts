@@ -1,7 +1,18 @@
 import { ScanResponse } from "../types";
 
-// ✅ UPDATE: Pakai URL Hugging Face yang sudah Running (Bukan PythonAnywhere lagi)
-const API_BASE_URL = "https://yudhadevsec-sidiktaut.hf.space";
+// =================================================================
+// 🎚️ HYBRID MODE SWITCH (Pilih salah satu, comment yang tidak dipakai)
+// =================================================================
+
+// [MODE 1] DEVELOPMENT (Localhost)
+// Gunakan ini saat develop di laptop sendiri
+// const API_BASE_URL = "http://localhost:5000";
+
+// [MODE 2] PRODUCTION (PythonAnywhere)
+// Gunakan ini saat deploy ke Vercel atau demo ke dosen (Online)
+const API_BASE_URL = "https://yudhadevsec.pythonanywhere.com";
+
+// =================================================================
 
 export const scanUrl = async (url: string): Promise<ScanResponse> => {
   try {
@@ -28,14 +39,11 @@ export const scanUrl = async (url: string): Promise<ScanResponse> => {
   } catch (err: any) {
     console.error("[API Error]", err);
 
-    if (
-      err.message.includes("Failed to fetch") ||
-      err.message.includes("NetworkError")
-    ) {
-      // ✅ Pesan error diperbarui
-      throw new Error("Gagal terhubung ke server SidikTaut (Hugging Face). Cek koneksi internet Anda.");
+    // Deteksi error khas PythonAnywhere (Whitelist Block)
+    if (err.message.includes("403") || err.message.includes("Server Error")) {
+       throw new Error("Gagal scan. Jika pakai PythonAnywhere Free, ingat hanya bisa scan situs Whitelist (Google, Youtube, dll).");
     }
 
-    throw err;
+    throw new Error("Gagal terhubung ke Backend. Pastikan server nyala.");
   }
 };
