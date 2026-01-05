@@ -1,0 +1,25 @@
+name: Sync Backend to Hugging Face
+
+on:
+  push:
+    branches: [main] # atau 'master', cek branch kamu apa
+    paths:
+      - 'backend/**' # Robot cuma jalan kalau folder backend berubah
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hugging Face Space
+        uses: nader-sl/huggingface-sync@v0.0.1
+        with:
+          # GANTI USERNAME DAN NAMA SPACE KAMU DI BAWAH INI:
+          repository: 'yudhadevsec/Sidiktaut' 
+          token: ${{ secrets.HF_TOKEN }}
+          directory: './backend'

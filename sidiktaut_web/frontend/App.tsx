@@ -9,10 +9,10 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
   
-  // [TAMBAHAN] State untuk animasi Navbar Slide Up
+  // untuk animasi Navbar Slide Up
   const [hideMobileNav, setHideMobileNav] = useState(false);
 
-  // --- DARK MODE LOGIC ---
+  // Logika DARK MODE
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
         const savedTheme = localStorage.getItem('theme');
@@ -22,10 +22,11 @@ export default function App() {
     return false;
   });
   
+  // State / Untuk data IP address
   const [ipData, setIpData] = useState<any>(null);
   const [ipCopied, setIpCopied] = useState(false);
 
-  // --- APPLY DARK MODE ---
+  // Terapkan Dark Mode
   useEffect(() => {
     const root = window.document.documentElement;
     if (darkMode) {
@@ -37,7 +38,8 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // --- SMART IP FETCH (Anti-Limit) ---
+  // Ngambil IP dari ipapi.co , kalau limit langsung ke ipwho.is 
+  // + Data disimpan juga di sessionstorage (cache), jadi gak perlu request ulang
   useEffect(() => {
     const fetchIpSmart = async () => {
       const cached = sessionStorage.getItem('sidiktaut_ip_cache');
@@ -56,7 +58,7 @@ export default function App() {
         setIpData(cleanData);
         sessionStorage.setItem('sidiktaut_ip_cache', JSON.stringify(cleanData));
       } catch (e) {
-        // Fallback ke ipwho.is jika limit
+        // Langsung ke ipwho.is kalau ipapi.co limit
         try {
             const resBackup = await fetch('https://ipwho.is/');
             if (!resBackup.ok) throw new Error("Backup Limit");
@@ -83,6 +85,8 @@ export default function App() {
     }
   };
 
+
+  // Daftar Menu Navigasi Bar (Navbar)
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard},
     { id: 'browser', label: 'Extension', icon: Globe },
@@ -104,12 +108,12 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-white font-sans overflow-hidden transition-colors duration-300 ease-in-out">
+    
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-white font-sans overflow-hidden transition-all duration-700 ease-in-out">
       
-      {/* MOBILE HEADER - [UBAH] Jadi motion.div agar bisa animasi tarik ke atas */}
+      {/* MOBILE HEADER*/}
       <motion.div 
          animate={{ y: hideMobileNav ? "-100%" : "0%" }}
-         // Gunakan transisi ini agar selaras dengan drawer
          transition={{ type: "spring", stiffness: 260, damping: 20 }}
          className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50 shadow-sm"
       >
@@ -124,30 +128,29 @@ export default function App() {
       </motion.div>
 
       {/* MOBILE DRAWER */}
-      {/* MOBILE DRAWER (OPTIMIZED 120FPS FEEL) */}
       <AnimatePresence>
       {mobileMenuOpen && (
         <>
-        {/* 1. OVERLAY BACKGROUND (Sekarang ada animasinya) */}
+        {/* OVERLAY BACKGROUND (ada animasi) */}
         <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }} // Fade cepat tapi halus
+            transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden" 
             onClick={() => setMobileMenuOpen(false)} 
         />
         
-        {/* 2. SIDEBAR PANEL (Menggunakan Spring Physics) */}
+        {/* SIDEBAR PANEL */}
         <motion.div 
             initial={{ x: "100%" }} 
             animate={{ x: "0%" }} 
             exit={{ x: "100%" }} 
             transition={{ 
                 type: "spring", 
-                stiffness: 300, // Kekakuan pegas (makin tinggi makin responsif)
-                damping: 30,    // Redaman (biar tidak memantul berlebihan)
-                mass: 1         // Berat objek
+                stiffness: 300, 
+                damping: 30,    
+                mass: 1         
             }} 
             className="fixed top-0 right-0 z-[70] w-64 h-full bg-white dark:bg-[#121214] border-l border-gray-100 dark:border-gray-800 flex flex-col md:hidden shadow-2xl"
         >
@@ -209,7 +212,6 @@ export default function App() {
                <AnimatePresence mode="wait">
                    {activeView === 'dashboard' && (
                      <motion.div key="dashboard" {...pageTransition} className="space-y-8">
-                       {/* [TAMBAHAN] Kirim props 'setHideMobileNav' ke Scanner */}
                        <Scanner onModalChange={setHideMobileNav} />
                        
                        <div>

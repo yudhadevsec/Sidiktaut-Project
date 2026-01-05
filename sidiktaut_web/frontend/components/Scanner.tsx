@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, memo } from 'react'; // 1. Tambah 'memo' disini
+import { useState, useMemo, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, AlertTriangle, Search, Loader2, XCircle, CheckCircle, Eye, X, ChevronLeft, Briefcase, Clock, Fingerprint, HelpCircle, ImageOff, Maximize2, Copy, Check, GitBranch, ChevronDown, ChevronUp, ChevronRight, Map } from 'lucide-react';
 import { scanUrl } from '../services/api'; 
@@ -15,7 +15,7 @@ const THREAT_MAP: Record<string, string> = {
   'default_bad': '⚠️ BAHAYA: Terdeteksi mencurigakan.',
 };
 
-// [TAMBAHAN] Terima props onModalChange dari App.tsx
+// Terima props onModalChange dari App.tsx
 function ScannerComponent({ onModalChange }: any) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ function ScannerComponent({ onModalChange }: any) {
   const [showModal, setShowModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'malicious' | 'harmless' | 'undetected'>('malicious');
   const [selectedDetail, setSelectedDetail] = useState<any>(null);
-  
+
   // STATE PREVIEW & SLIDER
   const [showPreview, setShowPreview] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -31,13 +31,13 @@ function ScannerComponent({ onModalChange }: any) {
   const [zoomImage, setZoomImage] = useState(false); 
   const [copiedHash, setCopiedHash] = useState(false);
   
-  // STATE BARU: CAROUSEL INDEX
+  // STATE CAROUSEL INDEX
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const [showTrace, setShowTrace] = useState(false);
   const [result, setResult] = useState<ScanResponse | any>(null);
 
-  // [TAMBAHAN] Logic: Kirim sinyal ke App saat modal dibuka/tutup
+  // Logika: Kirim sinyal ke App saat modal dibuka/tutup
   useEffect(() => {
     if (onModalChange) {
         onModalChange(showModal);
@@ -47,7 +47,7 @@ function ScannerComponent({ onModalChange }: any) {
   // MEMBUAT LIST GAMBAR DARI REDIRECTS
   const previewList = useMemo(() => {
       if (!result) return [];
-      // Jika ada redirects, gunakan list itu. Jika kosong, gunakan URL utama saja.
+      // Jika ada redirects, gunakan list itu. kalau kosong, gunakan URL utama aja.
       if (result.redirects && result.redirects.length > 0) {
           return result.redirects;
       }
@@ -58,7 +58,7 @@ function ScannerComponent({ onModalChange }: any) {
   useEffect(() => {
       if (result) setCurrentImageIndex(0);
   }, [result]);
-
+  // Fungsi scan url, cek link kosong atau ada karakter aneh (regex) , Validasi format url
   const handleScan = async () => {
     if (!url) return;
 
@@ -71,13 +71,13 @@ function ScannerComponent({ onModalChange }: any) {
     setLoading(true); setError(''); setResult(null); setShowModal(false); 
     setSelectedDetail(null); setShowTrace(false); 
     setShowPreview(false); setPreviewLoading(false); setPreviewError(false); setZoomImage(false); setCopiedHash(false);
-    setCurrentImageIndex(0); // Reset Slider
+    setCurrentImageIndex(0); 
 
     try {
       const data = await scanUrl(url);
       
       if (data.status === 'pending') {
-          setError('Link baru terdeteksi. Silakan klik ANALYZE lagi dalam 5 detik.');
+          setError('Link baru terdeteksi. Silakan klik "Mulai Scan" lagi dalam 5 detik.');
       } else { 
           setResult(data); 
           if(data.url) setUrl(data.url);
@@ -86,12 +86,13 @@ function ScannerComponent({ onModalChange }: any) {
       }
     } catch (e: any) { 
         console.error(e);
-        setError(e.message || 'GAGAL KONEK (Cek Backend)'); 
+        setError(e.message || 'GAGAL TERSAMBUNG (Cek Backend)'); 
     } finally { 
         setLoading(false); 
     }
   };
 
+  // Hash 256 copy
   const handleCopyHash = () => {
       if (result?.sha256) {
           navigator.clipboard.writeText(result.sha256);
@@ -100,6 +101,7 @@ function ScannerComponent({ onModalChange }: any) {
       }
   };
 
+  // Penjelasan berdasarkan kategori
   const getExplanation = (resultText: string, category: string) => {
     const text = resultText ? resultText.toLowerCase() : '';
     if (category === 'harmless') return THREAT_MAP['clean'];
@@ -152,11 +154,11 @@ function ScannerComponent({ onModalChange }: any) {
       setPreviewError(false);
   };
 
-  // --- NAVIGASI SLIDER ---
+  // Navslid (Navigation Slide)
   const nextImage = (e: any) => {
       e.stopPropagation();
       if (currentImageIndex < previewList.length - 1) {
-          setPreviewLoading(true); // Tampilkan loader saat ganti
+          setPreviewLoading(true); // Tampilkan loader (loading) saat ganti
           setCurrentImageIndex(prev => prev + 1);
       }
   };
@@ -164,7 +166,7 @@ function ScannerComponent({ onModalChange }: any) {
   const prevImage = (e: any) => {
       e.stopPropagation();
       if (currentImageIndex > 0) {
-          setPreviewLoading(true); // Tampilkan loader saat ganti
+          setPreviewLoading(true); // Tampilkan loader (loading) saat ganti
           setCurrentImageIndex(prev => prev - 1);
       }
   };
@@ -178,8 +180,8 @@ function ScannerComponent({ onModalChange }: any) {
       >
         <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
            <div>
-             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Scan disini </h1>
-             <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">Mini Project Based Learning by our mini PBL team</p>
+             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Sidik Scan </h1>
+             <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">Mini Project Based Learning by our team</p>
            </div>
            {!result && !loading && (<div className="hidden md:block bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl text-blue-600"><Shield size={36} /></div>)}
         </div>
@@ -203,7 +205,7 @@ function ScannerComponent({ onModalChange }: any) {
              {loading && (
                <div className="flex flex-col items-center gap-4 py-4">
                  <Loader2 className="animate-spin text-blue-600" size={48} />
-                 <span className="font-bold text-blue-600 dark:text-blue-400 tracking-[0.2em] text-xs uppercase">Tunggu sebentar ya :D</span>
+                 <span className="font-bold text-blue-600 dark:text-blue-400 tracking-[0.2em] text-xs uppercase">Tunggu sebentar ya</span>
                  <span className="text-[10px] text-gray-400">Mendeteksi protokol & scanning ancaman</span>
                </div>
              )}
@@ -217,7 +219,7 @@ function ScannerComponent({ onModalChange }: any) {
         </AnimatePresence>
       </motion.div>
 
-      {/* RESULTS SECTION */}
+      {/* Bagian Hasil cek link*/}
       <AnimatePresence>
       {result && !loading && (
         <motion.div 
@@ -226,9 +228,9 @@ function ScannerComponent({ onModalChange }: any) {
         >
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8">
              
-             {/* LEFT COLUMN */}
+             {/* Kolom Kiri */}
              <div className="lg:col-span-2 flex flex-col gap-6">
-                {/* 1. SCORE CARD */}
+                {/* Skor link (contoh 90/100) */}
                 <div className="bg-white dark:bg-[#121214] border border-gray-100 dark:border-gray-800 rounded-[2rem] p-8 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-[350px]">
                     <div>
                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-800">Risk Score</span>
@@ -247,7 +249,7 @@ function ScannerComponent({ onModalChange }: any) {
                        </div>
                     </div>
                     
-                    {/* VISUAL FORENSICS SLIDER */}
+                    {/* Slider Preview gambar dari link*/}
                     <div className="mt-10 pt-8 border-t border-gray-100 dark:border-gray-800/50">
                        <div className="flex justify-between items-center mb-4">
                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Visual Forensics (Jalur Redirect)</p>
@@ -269,7 +271,7 @@ function ScannerComponent({ onModalChange }: any) {
                                className={`relative w-full h-56 md:h-72 bg-gray-100 dark:bg-black/50 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-center group ${!previewLoading && !previewError ? 'cursor-pointer hover:border-blue-500 transition-colors' : ''}`}
                                onClick={() => !previewLoading && !previewError && setZoomImage(true)} 
                            >
-                               {/* TOMBOL NAVIGASI KIRI */}
+                               {/* Tombol nav kiri */}
                                {previewList.length > 1 && (
                                    <button 
                                            onClick={prevImage}
@@ -280,7 +282,7 @@ function ScannerComponent({ onModalChange }: any) {
                                    </button>
                                )}
 
-                               {/* TOMBOL NAVIGASI KANAN */}
+                               {/* Tombol nav kanan */}
                                {previewList.length > 1 && (
                                    <button 
                                            onClick={nextImage}
@@ -306,7 +308,7 @@ function ScannerComponent({ onModalChange }: any) {
                                ) : (
                                    <>
                                            <img 
-                                               key={currentImageIndex} // Key penting agar react re-render saat index berubah
+                                               key={currentImageIndex} // Key agar react re-render saat index berubah
                                                src={getPreviewUrl(previewList[currentImageIndex].url)} 
                                                alt={`Preview Step ${currentImageIndex + 1}`} 
                                                className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" 
@@ -314,7 +316,7 @@ function ScannerComponent({ onModalChange }: any) {
                                                onError={() => { setPreviewLoading(false); setPreviewError(true); }} 
                                            />
                                            
-                                           {/* CAPTION PENJELASAN DI DALAM GAMBAR (BAGIAN BAWAH) */}
+                                           {/* Caption penjelasan di gambar preview (BAGIAN BAWAH) */}
                                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 pt-10 text-white">
                                                     <div className="flex items-center gap-2 mb-1">
                                                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${currentImageIndex === 0 ? 'bg-blue-500' : (currentImageIndex === previewList.length - 1 ? 'bg-purple-500' : 'bg-gray-600')}`}>
@@ -341,7 +343,7 @@ function ScannerComponent({ onModalChange }: any) {
                     </div>
                 </div>
 
-                {/* 2. REDIRECT TRACE (LIST) */}
+                {/* List Hop (dari trace redirect link) */}
                 {result.redirects && result.redirects.length > 1 && (
                     <div className="bg-white dark:bg-[#121214] border border-gray-100 dark:border-gray-800 rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                         <button 
@@ -390,20 +392,22 @@ function ScannerComponent({ onModalChange }: any) {
                 )}
              </div>
 
-             {/* RIGHT COLUMN */}
+             {/* Kolom Kanan */}
+             {/* Berisi Kotak hitam analisis ancaman dan detail dari link */}
              <div className="flex flex-col gap-5">
                  <div className="bg-[#111827] dark:bg-black rounded-[2rem] p-8 text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-800">
-                    <h3 className="font-bold text-sm mb-6 flex items-center gap-2"><Shield className="text-blue-500" size={18} /> Threat Analysis</h3>
+                    <h3 className="font-bold text-sm mb-6 flex items-center gap-2"><Shield className="text-blue-500" size={18} /> Analisis Ancaman</h3>
                     <div className="space-y-3 mb-8">
                        <StatRow label="Malicious" value={result.malicious || 0} color="text-red-400" bg="bg-red-400/10" icon={AlertTriangle} />
                        <StatRow label="Suspicious" value={result.suspicious || 0} color="text-yellow-400" bg="bg-yellow-400/10" icon={AlertTriangle} />
                        <StatRow label="Clean" value={result.harmless || 0} color="text-green-400" bg="bg-green-400/10" icon={CheckCircle} />
                     </div>
                     <button onClick={() => setShowModal(true)} className="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded-2xl font-bold text-xs flex items-center justify-center gap-3 transition-colors shadow-[0_4px_14px_0_rgba(37,99,235,0.2)]">
-                       <Eye size={16} /> VIEW DETAILS
+                       <Eye size={16} /> Lihat Detail
                    </button>
                  </div>
 
+                  {/* Bagian tentang Domain (whois) dan Hash SHA-256*/}
                  <div className="bg-white dark:bg-[#121214] border border-gray-100 dark:border-gray-800 rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                     <h3 className="font-bold text-sm mb-6 flex items-center gap-2 text-gray-900 dark:text-white pb-3 border-b border-gray-100 dark:border-gray-800">
                        <Briefcase className="text-orange-500" size={18} /> Tentang Domain ini
@@ -443,22 +447,18 @@ function ScannerComponent({ onModalChange }: any) {
       )}
       </AnimatePresence>
 
-      {/* MODAL DETAIL */}
+      {/* Bagian dalam Lihat Detail */}
       <AnimatePresence>
       {showModal && result && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-           
-           {/* [PERBAIKAN 2] Ubah rounded-[3rem] (48px) jadi rounded-3xl (24px) agar tidak ekstrim */}
            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="bg-white dark:bg-[#121214] w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border border-gray-100 dark:border-gray-800">
               <div className="p-6 border-b border-gray-100 dark:border-gray-800 shrink-0 flex justify-between items-center bg-gray-50/50 dark:bg-white/5">
-                 <h3 className="font-black text-xl dark:text-white flex items-center gap-2"><Shield size={20} className="text-blue-500"/> Scan Details</h3>
+                 <h3 className="font-black text-xl dark:text-white flex items-center gap-2"><Shield size={20} className="text-blue-500"/> Detail Analisis</h3>
                  <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full"><X size={24} className="text-gray-500"/></button>
               </div>
               
               {!selectedDetail && (
                 <div className="px-6 pt-4 shrink-0">
-                   
-                   {/* [PERBAIKAN 1] Ganti 'flex' jadi 'grid grid-cols-3' agar tombol malicious/harmless rapi dan tidak acak-acakan */}
                    <div className="grid grid-cols-3 gap-1 p-1 bg-gray-100 dark:bg-[#0a0a0a] rounded-xl border border-gray-100 dark:border-gray-800">
                      {(['malicious', 'harmless', 'undetected'] as const).map((tab) => (
                         <button key={tab} onClick={() => setActiveFilter(tab)} className={`py-2 rounded-lg text-[10px] md:text-xs font-bold capitalize transition-all flex flex-col md:flex-row items-center justify-center gap-1 ${activeFilter === tab ? 'bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>
@@ -490,7 +490,7 @@ function ScannerComponent({ onModalChange }: any) {
                                 </span>
                                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/50 dark:bg-black/20 text-gray-900 dark:text-white">{item.result}</span>
                              </button>
-                        )) : <div className="text-center text-gray-400 py-4 font-bold">No engines data available</div>}
+                        )) : <div className="text-center text-gray-400 py-4 font-bold">Tidak ada data</div>}
                      </div>
                    )}
               </div>
@@ -499,7 +499,7 @@ function ScannerComponent({ onModalChange }: any) {
       )}
       </AnimatePresence>
 
-      {/* --- IMAGE ZOOM MODAL (Updated: Uses current index for zooming) --- */}
+      {/* Zoom gambar preview*/}
       <AnimatePresence>
         {zoomImage && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[80] bg-black/90 flex items-center justify-center p-4 backdrop-blur-md" onClick={() => setZoomImage(false)}>
@@ -518,6 +518,4 @@ function ScannerComponent({ onModalChange }: any) {
 function StatRow({ label, value, color, bg, icon: Icon }: any) {
   return (<div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10"><div className="flex items-center gap-3"><div className={`p-2 rounded-xl ${bg} ${color}`}><Icon size={18}/></div><span className="text-sm font-bold text-gray-300">{label}</span></div><span className={`text-xl font-black ${color}`}>{value}</span></div>)
 }
-
-// 3. Export menggunakan memo agar component ini tidak di-render ulang jika props/parent berubah
 export default memo(ScannerComponent);

@@ -1,7 +1,6 @@
 flask
 flask-cors
-python-dotenv
 requests
 python-whois
-colorama
-cryptography
+python-dotenv
+gunicorn

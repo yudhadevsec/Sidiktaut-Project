@@ -2,7 +2,7 @@ import { useState, memo } from 'react';
 import { Terminal, Chrome, Github, Shield, Code, Server, Layout, Network, Cpu, Copy, ExternalLink, Zap, ChevronLeft, ArrowRight, Instagram, Linkedin, Mail, Check, AlertCircle, Play, FileText, Download, FileDown, ArrowLeft, ArrowRightCircle, ArrowRightIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- SHARED COMPONENTS ---
+// Kalau mau ganti warna tombol biar Download.zip / Readme.md semua konsisten
 function PrimaryBtn({ icon: Icon, label, onClick, className = "bg-white text-blue-700 hover:bg-gray-100" }: any) {
   return (
     <button onClick={onClick} className={`px-6 py-3 md:px-8 md:py-4 rounded-full font-bold flex items-center justify-center gap-2 shadow-[0_4px_14px_0_rgb(0,0,0,0.05)] border border-transparent transition-all active:scale-95 text-sm md:text-base ${className}`}>
@@ -19,6 +19,7 @@ function SecondaryBtn({ icon: Icon, label, onClick, className = "bg-black/20 tex
   );
 }
 
+// Fungsi Kotak kayak di Scan Satset , Perlindungan Real-time dkk
 function FeatureCard({ icon: Icon, title, desc }: any) {
   return (
     <div className="bg-white dark:bg-[#121214] p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 flex flex-col gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-blue-500 transition-colors h-full">
@@ -33,14 +34,13 @@ function FeatureCard({ icon: Icon, title, desc }: any) {
   )
 }
 
-// --- BROWSER EXTENSION VIEW (OPTIMIZED) ---
-// PERBAIKAN: Menggunakan div biasa (bukan motion.div) untuk menghindari animasi ganda penyebab lag
+// Bagian tampilan Sidiktaut Extension
 export const BrowserView = memo(function BrowserView() {
   const handleDownloadZip = () => { const link = document.createElement('a'); link.href = '/sidiktaut-ext.zip'; link.download = 'sidiktaut-ext.zip'; link.click(); };
 
   return (
     <div className="space-y-6 md:space-y-8 pb-12">
-      {/* BANNER UTAMA */}
+      {/* Kotak utama yang ada tulisan SidikTaut Extension */}
       <div className="bg-blue-700 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 text-white shadow-[0_20px_50px_-10px_rgba(29,78,216,0.2)] relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-10">
         <div className="relative z-10 max-w-2xl w-full">
           <div className="flex flex-wrap items-center gap-3 mb-4 md:mb-6">
@@ -60,14 +60,14 @@ export const BrowserView = memo(function BrowserView() {
         </div>
       </div>
 
-      {/* GRID FITUR */}
+      {/* Bagian FeatureCard (Scan Satset dkk) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <FeatureCard icon={Zap} title="Scan Satset" desc="Analisis link kamu secara otomatis gak sampai 2 detik!" />
         <FeatureCard icon={Shield} title="Perlindungan Real-time" desc="Otomatis mencegah kamu dari ancaman link berbahaya!" />
         <FeatureCard icon={Cpu} title="Sangat Ringan" desc="Didesain untuk kamu yang gak cuma pengen satset, tapi juga gak lelet" />
       </div>
 
-      {/* SECTION CARA INSTALL & SPECS */}
+      {/* Bagian Cara Menginstall */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 pt-2 md:pt-4">
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full"><FileText size={18} md:size={20} /></div> Cara Menginstall</h3>
@@ -82,7 +82,7 @@ export const BrowserView = memo(function BrowserView() {
           </div>
         </div>
         
-        {/* KOLOM KANAN (Persyaratan Sistem) */}
+        {/* Bagian System Requirements / Persyaratan Sistem */}
         <div className="space-y-6">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full"><Code size={20} /></div> Persyaratan Sistem</h3>
           <div className="bg-gray-50 dark:bg-[#121214] rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-800 h-fit shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
@@ -92,7 +92,6 @@ export const BrowserView = memo(function BrowserView() {
               <SpecItem label="Koneksi" value="Wajib Online (Internet)" />
               <SpecItem label="Versi Minimal" value="Chrome v88+" />
             </ul>
-            {/* BAGIAN NOTE YANG DIHAPUS DARI SINI */}
           </div>
         </div>
       </div>
@@ -100,8 +99,7 @@ export const BrowserView = memo(function BrowserView() {
   );
 });
 
-// --- CLI TOOL VIEW (OPTIMIZED) ---
-// --- CLI TOOL VIEW (OPTIMIZED & RE-LAYOUT) ---
+// Bagian Tampilan SidikTaut CLI
 export const CliView = memo(function CliView() {
   const [installCopied, setInstallCopied] = useState(false); 
   const LOGO_CONFIG = {
@@ -113,17 +111,13 @@ export const CliView = memo(function CliView() {
 
   return (
     <div className="space-y-6 md:space-y-8 pb-12">
-      {/* PERBAIKAN LAYOUT: 
-         1. min-h-[400px] dihapus agar tinggi menyesuaikan isi.
-         2. gap dikurangi dari 8/10 menjadi 5/8 agar elemen lebih rapat (social distancing dikurangi).
-      */}
       <div className="bg-[#1a1a1a] dark:bg-black rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-5 md:gap-8 border border-gray-800 relative overflow-hidden">
          
-         {/* Background Logos (Posisi disesuaikan sedikit agar pas dengan box yang makin pendek) */}
+         {/* Background Logo (Posisi disesuaikan agar pas dengan box yang makin pendek) */}
          <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}><motion.img src="/tux.png" alt="Tux Linux" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }} className="w-full h-full object-contain brightness-200 contrast-50" /></div>
          <div className={`${LOGO_CONFIG.python.mobile} ${LOGO_CONFIG.python.desktop} pointer-events-none select-none z-0`}><motion.img src="/python.png" alt="Python" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200 contrast-50" /></div>
          
-         {/* Content Kiri */}
+         {/* Content Kiri (Judul dan deskripsi) */}
          <div className="flex-1 relative z-10 w-full">
             <div className="flex flex-wrap items-center gap-3 mb-3 md:mb-5">
                <span className="px-3 py-1 bg-amber-900/20 text-amber-400 rounded-full text-[10px] md:text-xs font-bold border border-amber-800 flex items-center gap-2"><Terminal size={12}/> Versi 0.1</span>
@@ -139,7 +133,6 @@ export const CliView = memo(function CliView() {
          </div>
 
          {/* Content Kanan (Run Program) */}
-         {/* PERBAIKAN: mt-8 dikurangi jadi mt-5 agar tidak terlalu jauh di mobile */}
          <div className="relative z-10 w-full md:w-auto md:min-w-[320px] mt-5 md:mt-0">
             <p className="text-[10px] font-bold text-gray-500 mb-2 md:mb-2 uppercase tracking-wider ml-1">Run Program</p>
             <div className="bg-black rounded-2xl md:rounded-[1.5rem] border border-gray-800 p-4 md:p-5 flex items-center justify-between group shadow-lg hover:border-amber-600 transition-colors w-full relative z-20">
@@ -149,14 +142,14 @@ export const CliView = memo(function CliView() {
          </div>
       </div>
 
-      {/* Grid Features */}
+      {/* Feature Card yang kayak extension tapi ini Trace Redirects dkk */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <FeatureCard icon={Network} title="Trace Redirects" desc="Otomatis melacak jalur redirect link sebelum sampai ke tujuan akhir." />
         <FeatureCard icon={FileText} title="Deep Analysis" desc="Menampilkan detail deteksi dari setiap vendor antivirus (Mode -d)." />
         <FeatureCard icon={Download} title="Auto Logging" desc="Simpan hasil analisis forensik ke file text secara otomatis (Mode -o)." />
       </div>
 
-      {/* Bagian Bawah (Video & Arguments) tetap sama */}
+      {/* Bagian Bawah (Video & Arguments), mirip sama yang extension cuma beda dikit */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 pt-2 md:pt-4">
          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-full"><Play size={18} md:size={20}/></div> Contoh penggunaan</h3>
@@ -191,12 +184,11 @@ export const CliView = memo(function CliView() {
   );
 });
 
-// --- TEAM VIEW (ANIMATED) ---
-// --- TEAM VIEW (ANIMATED & UPDATED SOCIALS) ---
+// Bagian Tampilan Meet Our Team / Tim Kami
 export const TeamView = memo(function TeamView() {
   const [selectedMember, setSelectedMember] = useState<any>(null);
   
-  // UPDATE DATA LINK DI SINI
+  // DATA MEMBER TIM
   const teamMembers = [
     { 
       name: 'Yudha Pratama', 
@@ -288,12 +280,11 @@ export const TeamView = memo(function TeamView() {
   );
 });
 
-// --- HELPER COMPONENTS ---
+// Ikon pembantu dan komponen kecil lainnya (contoh bulatan angka step by step 1,2,3 dll)
 function StepItem({ number, title, children }: any) { return (<div className="flex gap-4 md:gap-5"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-xs md:text-sm shrink-0 border border-blue-100 dark:border-blue-800">{number}</div><div><h4 className="font-bold text-gray-900 dark:text-white text-sm md:text-base mb-1">{title}</h4><p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{children}</p></div></div>) }
 function SpecItem({ label, value }: any) { return (<li className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4 border-b border-gray-200 dark:border-gray-700/50 pb-3 last:border-0 last:pb-0"><span className="text-gray-500 dark:text-gray-400 font-medium text-xs uppercase tracking-wide sm:normal-case sm:tracking-normal">{label}</span><span className="font-bold text-gray-900 dark:text-white text-sm sm:text-right">{value}</span></li>) }
 function CodeBlock({ title, cmd }: any) { const [isCopied, setIsCopied] = useState(false); const handleCopy = () => { navigator.clipboard.writeText(cmd); setIsCopied(true); setTimeout(() => setIsCopied(false), 2000); }; return (<div className="group"><p className="text-[10px] md:text-xs font-bold text-gray-400 mb-2 ml-2 uppercase tracking-wider">{title}</p><div className="bg-[#0a0a0a] rounded-2xl md:rounded-[1.5rem] border border-gray-800 p-4 md:p-5 font-mono text-xs md:text-sm text-amber-400 flex justify-between items-center hover:border-gray-600 transition-colors shadow-inner"><span className="break-all mr-2">{cmd}</span><div onClick={handleCopy} className="p-2 cursor-pointer transition-colors hover:text-white shrink-0">{isCopied ? <Check size={16} className="text-amber-500" /> : <Copy size={16} className="text-gray-600 group-hover:text-white" />}</div></div></div>) }
 function ArgRow({ flag, desc }: any) { return (<tr className="border-b border-gray-100 dark:border-gray-800/50 last:border-0 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"><td className="px-4 py-3 md:px-6 md:py-4 font-mono text-[10px] md:text-xs text-gray-700 dark:text-gray-300 font-bold whitespace-nowrap">{flag}</td><td className="px-4 py-3 md:px-6 md:py-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm">{desc}</td></tr>) }
-// Ganti function SocialBtn yang lama dengan ini:
 function SocialBtn({ icon: Icon, label, href }: any) { 
   return (
     <button 
