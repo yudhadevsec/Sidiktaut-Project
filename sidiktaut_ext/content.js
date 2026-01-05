@@ -246,3 +246,40 @@ function closePopup(element) {
     if (root) root.remove();
   }, 200);
 }
+
+// Listener baru yang lebih stabil
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "SHOW_DETAIL_OVERLAY") {
+    let root = document.getElementById("sidiktaut-root");
+    
+    // 1. Jika overlay belum ada di halaman ini, buat dulu
+    if (!root) {
+      injectPopup();
+      root = document.getElementById("sidiktaut-root");
+    }
+
+    const shadow = root.shadowRoot;
+    const overlay = shadow.querySelector(".st-overlay");
+    
+    // 2. Munculkan overlay & reset animasi agar segar kembali
+    overlay.style.display = "block";
+    const mainCard = shadow.getElementById("mainCard");
+    mainCard.style.animation = "none";
+    mainCard.offsetHeight; // trik agar animasi slideIn jalan lagi
+    mainCard.style.animation = "slideIn 0.3s ease-out";
+
+    // 3. Sembunyikan tombol "Jangan tanya lagi" (opsional agar UI lebih fokus)
+    const btnNever = shadow.getElementById("btnNever");
+    if (btnNever) btnNever.style.display = "none";
+
+    const uiElements = {
+      title: shadow.getElementById("titleText"),
+      desc: shadow.getElementById("descText"),
+      contentArea: shadow.getElementById("contentArea"),
+      btnGroup: shadow.getElementById("btnGroup")
+    };
+
+    // 4. Panggil fungsi detail yang sudah ada di content.js Anda
+    showDetailView(request.data, uiElements, overlay, shadow);
+  }
+});
