@@ -1,6 +1,7 @@
 import { ScanResponse } from "../types";
 
-const API_BASE_URL = "https://yudhadevsec.pythonanywhere.com";
+// ✅ UPDATE: Pakai URL Hugging Face yang sudah Running (Bukan PythonAnywhere lagi)
+const API_BASE_URL = "https://yudhadevsec-sidiktaut.hf.space";
 
 export const scanUrl = async (url: string): Promise<ScanResponse> => {
   try {
@@ -31,7 +32,8 @@ export const scanUrl = async (url: string): Promise<ScanResponse> => {
       err.message.includes("Failed to fetch") ||
       err.message.includes("NetworkError")
     ) {
-      throw new Error("Tidak bisa terhubung ke backend PythonAnywhere.");
+      // ✅ Pesan error diperbarui
+      throw new Error("Gagal terhubung ke server SidikTaut (Hugging Face). Cek koneksi internet Anda.");
     }
 
     throw err;
