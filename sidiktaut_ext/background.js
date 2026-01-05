@@ -14,18 +14,27 @@ const API_ENDPOINT = "https://yudhadevsec.pythonanywhere.com/scan";
 
 // =================================================================
 
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "sidiktaut_manual",
+    id: "sidiktaut_scan_link",
     title: "🛡️ Scan Link Ini",
-    contexts: ["page", "link"]
+    contexts: ["link"]
   });
+});
+
+chrome.contextMenus.onClicked.addListener((info) => {
+  console.log("Menu clicked:", info);
+
+  if (info.menuItemId === "sidiktaut_scan_link" && info.linkUrl) {
+    performScanAndNotify(info.linkUrl);
+  }
+});
 
   chrome.storage.sync.get(["sidik_auto_scan", "sidik_ask_scan"], (res) => {
     if (res.sidik_auto_scan === undefined) chrome.storage.sync.set({ sidik_auto_scan: false });
     if (res.sidik_ask_scan === undefined) chrome.storage.sync.set({ sidik_ask_scan: true });
   });
-});
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url && tab.url.startsWith("http")) {
@@ -71,42 +80,67 @@ async function fetchScanData(url) {
 }
 
 async function performScanAndNotify(url) {
-  const notifId = `scan-${Date.now()}`;
-
-  chrome.notifications.create(notifId, {
+  // 1. Buat ID unik untuk loading saja
+  const loadingId = `loading-${Date.now()}`;
+  
+  chrome.notifications.create(loadingId, {
     type: "basic",
     iconUrl: "icon.png",
     title: "SidikTaut",
-    message: "Memindai URL...",
+    message: "Sedang menganalisis link...",
     priority: 0,
     silent: true
   });
 
   try {
     const data = await fetchScanData(url);
-    chrome.notifications.clear(notifId);
+    
+    // 2. Hapus loading SEBELUM membuat hasil dengan ID yang berbeda
+    chrome.notifications.clear(loadingId);
 
+    // 3. Buat ID unik untuk hasil
+    const resultId = `result-${Date.now()}`;
     const malicious = data.malicious || 0;
     const isSafe = malicious === 0;
 
-    chrome.notifications.create({
+    // Simpan data ke storage menggunakan resultId sebagai key
+    const storageKey = `data_${resultId}`;
+    await chrome.storage.local.set({ [storageKey]: data });
+
+    chrome.notifications.create(resultId, {
       type: "basic",
       iconUrl: "icon.png",
       title: isSafe ? "✅ Link Aman" : "⚠️ BAHAYA TERDETEKSI",
-      message: isSafe
-        ? `Reputasi: ${data.reputation}/100. Aman.`
-        : `Ditemukan ${malicious} ancaman berbahaya!`,
+      message: isSafe 
+        ? `Reputasi: ${data.reputation}/100. Klik tombol di bawah untuk detail.`
+        : `Peringatan! ${malicious} ancaman terdeteksi. Klik untuk detail.`,
+      buttons: [{ title: "🔍 Lihat Detail Keamanan" }],
       priority: 2,
-      requireInteraction: !isSafe
+      requireInteraction: true // Notif tidak akan hilang otomatis
     });
 
   } catch (error) {
-    chrome.notifications.clear(notifId);
-    console.error(error);
+    chrome.notifications.clear(loadingId);
+    console.error("Scan Error:", error);
   }
 }
 
-chrome.contextMenus.onClicked.addListener((info) => {
-  const url = info.linkUrl || info.pageUrl;
-  if (url) performScanAndNotify(url);
+// Update listener klik tombol agar sesuai dengan key baru
+chrome.notifications.onButtonClicked.addListener(async (notifId, btnIdx) => {
+  if (btnIdx === 0) {
+    const storageKey = `data_${notifId}`; // Sesuaikan dengan key di atas
+    const result = await chrome.storage.local.get(storageKey);
+    const data = result[storageKey];
+
+    if (data) {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) {
+        chrome.tabs.sendMessage(tab.id, { 
+          action: "SHOW_DETAIL_OVERLAY", 
+          data: data 
+        });
+      }
+      chrome.storage.local.remove(storageKey);
+    }
+  }
 });
