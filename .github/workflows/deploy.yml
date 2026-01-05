@@ -22,4 +22,4 @@ jobs:
           # GANTI USERNAME DAN NAMA SPACE KAMU DI BAWAH INI:
           repository: 'yudhadevsec/Sidiktaut' 
           token: ${{ secrets.HF_TOKEN }}
-          directory: './backend'
+          directory: './sidiktaut_web/backend'
