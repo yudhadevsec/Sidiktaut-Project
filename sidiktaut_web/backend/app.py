@@ -14,18 +14,17 @@ import urllib3
 # 1. Matikan Warning SSL
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# Load env variables
 load_dotenv()
 
-# 2. Definisi App DULUAN (Wajib di atas CORS)
 app = Flask(__name__)
 
-# 3. Baru panggil CORS
+# 2. HYBRID CORS: Biarkan '*' biar Vercel & Localhost bisa akses tanpa pusing
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 VT_API_KEY = os.getenv("VT_API_KEY") 
 VT_URL = "https://www.virustotal.com/api/v3/urls"
 
-# 4. Header Anti-Blokir (PENTING!)
 HEADERS_UA = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -45,7 +44,6 @@ def resolve_protocol(raw_url):
     if raw_url.startswith("http://") or raw_url.startswith("https://"):
         return raw_url
     try:
-        # Pakai GET stream=True biar lebih sopan ke server target
         test_url = f"https://{raw_url}"
         response = requests.get(test_url, timeout=5, headers=HEADERS_UA, verify=False, stream=True)
         if response: 
@@ -56,9 +54,6 @@ def resolve_protocol(raw_url):
     return f"http://{raw_url}"
 
 def trace_redirects(url):
-    """
-    TRACE LEVEL: AGGRESSIVE (Manual Loop)
-    """
     session = requests.Session()
     session.headers.update(HEADERS_UA)
     session.cookies.clear()
@@ -68,18 +63,15 @@ def trace_redirects(url):
     
     for _ in range(8):
         try:
-            # allow_redirects=False adalah KUNCI biar gak diloncat otomatis
             response = session.get(current_url, timeout=10, allow_redirects=False, verify=False)
             
             chain.append({"status": response.status_code, "url": current_url})
             
             next_url = None
 
-            # Cek Redirect HTTP (301/302)
             if 300 <= response.status_code < 400:
                 next_url = response.headers.get('Location')
             
-            # Cek Redirect HTML (Meta/JS) - Penting buat yang menyembunyikan redirect
             else:
                 content_type = response.headers.get('Content-Type', '').lower()
                 if 'text/html' in content_type:
@@ -108,7 +100,10 @@ def trace_redirects(url):
                 continue 
             
             break
-        except:
+        except Exception as e:
+            # Error handling khusus PythonAnywhere Free Tier (Block outbound)
+            if "ProxyError" in str(e) or "Connection refused" in str(e):
+                print(f"[PA Free Tier Limitation] Gagal trace {current_url}")
             break
 
     if not chain: chain.append({"status": 200, "url": url})
@@ -138,7 +133,7 @@ def scan_url():
         try:
             vt_response = requests.get(f"{VT_URL}/{url_id_api}", headers=headers, timeout=15)
         except:
-            return jsonify({"error": "Koneksi server bermasalah"}), 503
+            return jsonify({"error": "Koneksi ke VirusTotal Gagal (Cek Internet/Limit)"}), 503
 
         if vt_response.status_code == 404:
             requests.post(VT_URL, data={"url": target_url}, headers=headers, timeout=15)
@@ -193,5 +188,17 @@ def scan_url():
         print(f"[ERROR] {e}") 
         return jsonify({"error": "Internal Server Error"}), 500
 
+# ===============================================================
+# 🚀 HYBRID LAUNCHER
+# Bagian ini CUMA jalan kalau di Localhost.
+# PythonAnywhere mengabaikan ini (karena dia pakai WSGI).
+# ===============================================================
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Baca variabel FLASK_DEBUG dari .env (Default: False biar aman)
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() == "true"
+    
+    # Baca port dari .env (Default: 5000)
+    port = int(os.getenv("PORT", 5000))
+
+    print(f"🚀 Running in {'DEBUG' if debug_mode else 'PRODUCTION'} mode on port {port}")
+    app.run(debug=debug_mode, port=port)
