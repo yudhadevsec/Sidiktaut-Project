@@ -17,8 +17,8 @@ jobs:
           lfs: true
 
       - name: Push to Hugging Face Space
-        # INI YANG SUDAH DIPERBAIKI (nateraw)
-        uses: nateraw/huggingface-sync-action@v0.0.6
+        # GANTI JADI v0.0.5 (INI YANG BENAR)
+        uses: nateraw/huggingface-sync-action@v0.0.5
         with:
           repository: 'yudhadevsec/Sidiktaut' 
           token: ${{ secrets.HF_TOKEN }}
