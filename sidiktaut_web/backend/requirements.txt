@@ -3,4 +3,4 @@ flask-cors
 requests
 python-whois
 python-dotenv
-gunicorn 
+gunicorn

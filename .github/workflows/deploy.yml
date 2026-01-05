@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      # Robot hanya jalan kalau file di dalam folder ini berubah
       - 'sidiktaut_web/backend/**'
 
 jobs:
@@ -18,11 +17,9 @@ jobs:
           lfs: true
 
       - name: Push to Hugging Face Space
-        uses: nader-sl/huggingface-sync@v0.0.1
+        # INI YANG SUDAH DIPERBAIKI (nateraw)
+        uses: nateraw/huggingface-sync-action@v0.0.6
         with:
-          # Pastikan ini sesuai: usernameHF/NamaSpace
           repository: 'yudhadevsec/Sidiktaut' 
           token: ${{ secrets.HF_TOKEN }}
-          
-          # INI KUNCINYA: Kita suruh dia masuk ke dalam folder sidiktaut_web dulu
           directory: './sidiktaut_web/backend'
