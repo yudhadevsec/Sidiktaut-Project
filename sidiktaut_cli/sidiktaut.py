@@ -72,7 +72,8 @@ def trace_redirects(url):
         else:
             test_url = current_url
 
-        response = requests.head(test_url, allow_redirects=True, headers=HEADERS_UA, timeout=10)
+        response = requests.get(test_url, allow_redirects=True, headers=HEADERS_UA, timeout=10, stream=True)
+        if response: response.close() # Tutup koneksi setelah dapat header
         
         if response.history:
             for resp in response.history:
