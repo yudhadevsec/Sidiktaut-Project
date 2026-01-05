@@ -1,5 +1,16 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // Element User Interface
+  // =================================================================
+  // 🎚️ HYBRID MODE SWITCH (Wajib sama dengan background.js)
+  // =================================================================
+  
+  // [MODE 1] DEVELOPMENT
+  // const API_BASE_URL = "http://127.0.0.1:5000"; 
+  
+  // [MODE 2] PRODUCTION
+  const API_BASE_URL = "https://yudhadevsec.pythonanywhere.com";
+  
+  // =================================================================
+
   const ui = {
     scanBtn: document.getElementById("scanBtn"),
     urlInput: document.getElementById("urlInput"),
@@ -26,19 +37,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tab?.url && tab.url.startsWith("http")) ui.urlInput.value = tab.url;
 
-  // Cek server (cek mesin hidup atau gak)
   checkServer();
 
-  // --- AUTO DETECT CONNECTION ---
   window.addEventListener('online',  () => { checkServer(); });
   window.addEventListener('offline', () => { updateBadgeOffline(); });
 
-  // Cek server setiap 3 detik
   setInterval(() => {
     if (navigator.onLine) {
        checkServer(true);
     }
-  }, 3000);
+  }, 5000); // Ubah jadi 5 detik biar gak spamming server
 
   ui.themeBtn.addEventListener("click", () => {
     currentTheme = currentTheme === "dark" ? "light" : "dark";
@@ -82,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         ui.errorMsg.innerText = "Gagal. Cek koneksi backend/API Key.";
         ui.errorMsg.classList.remove("hidden");
-        checkServer(); // Server di cek lagi kalau scan gagal
+        checkServer(); 
       }
     });
   });
@@ -140,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ui.status.className = "badge offline";
   }
 
-  // Fungsi cek server
+  // ✅ Fungsi Cek Server (Sekarang pakai variabel Switch)
   async function checkServer(silent = false) {
     if (!navigator.onLine) {
        updateBadgeOffline();
@@ -154,23 +162,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const controller = new AbortController();
-      setTimeout(() => controller.abort(), 1000);
+      setTimeout(() => controller.abort(), 2000); // 2 Detik Timeout
       
-      await fetch("https://yudhadevsec.pythonanywhere.com/scan", { 
+      // Menggunakan API_BASE_URL yang dinamis
+      await fetch(`${API_BASE_URL}/scan`, { 
         method: "OPTIONS", 
         signal: controller.signal 
       });
 
-      
-      // Jika berhasil, maka
       ui.status.textContent = "ONLINE";
       ui.status.className = "badge online";
+      ui.status.title = `Terhubung ke: ${API_BASE_URL}`;
 
     } catch (e) {
-      // Jika gagal connect backend
       ui.status.textContent = "OFFLINE"; 
       ui.status.className = "badge offline";
-      ui.status.title = "Pastikan 'python app.py' berjalan";
+      ui.status.title = `Gagal terhubung ke: ${API_BASE_URL}`;
     }
   }
 });

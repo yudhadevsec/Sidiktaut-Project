@@ -1,8 +1,18 @@
 /**
- * SIDIKTAUT BACKGROUND SERVICE
+ * SIDIKTAUT BACKGROUND SERVICE (HYBRID MODE)
  */
 
-const API_ENDPOINT = "http://127.0.0.1:5000/scan";
+// =================================================================
+// 🎚️ HYBRID MODE SWITCH (Pilih salah satu, comment yang tidak dipakai)
+// =================================================================
+
+// [MODE 1] DEVELOPMENT (Localhost)
+// const API_ENDPOINT = "http://127.0.0.1:5000/scan";
+
+// [MODE 2] PRODUCTION (PythonAnywhere) - DEFAULT
+const API_ENDPOINT = "https://yudhadevsec.pythonanywhere.com/scan";
+
+// =================================================================
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -43,17 +53,21 @@ async function handleScanRequest(url, sendResponse) {
 }
 
 async function fetchScanData(url) {
-  const response = await fetch(API_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CLIENT-ID": "sidiktaut-extension"
-    },
-    body: JSON.stringify({ url })
-  });
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CLIENT-ID": "sidiktaut-extension"
+      },
+      body: JSON.stringify({ url })
+    });
 
-  if (!response.ok) throw new Error("Gagal terhubung ke Backend (Cek app.py)");
-  return await response.json();
+    if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+    return await response.json();
+  } catch (err) {
+    throw new Error("Gagal terhubung ke Backend. Pastikan server nyala.");
+  }
 }
 
 async function performScanAndNotify(url) {
