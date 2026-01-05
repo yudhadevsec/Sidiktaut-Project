@@ -17,9 +17,21 @@ jobs:
           lfs: true
 
       - name: Push to Hugging Face Space
-        # GANTI JADI v0.0.5 (INI YANG BENAR)
         uses: nateraw/huggingface-sync-action@v0.0.5
         with:
-          repository: 'yudhadevsec/Sidiktaut' 
-          token: ${{ secrets.HF_TOKEN }}
-          directory: './sidiktaut_web/backend'
+          # --- PERHATIKAN BAGIAN INI (BEDA DARI SEBELUMNYA) ---
+          
+          # 1. Wajib isi nama Repo GitHub kamu (Lihat dari screenshot kamu)
+          github_repo_id: 'yudhadevsec/Sidiktaut-Project'
+          
+          # 2. Nama Repo Hugging Face Tujuan
+          huggingface_repo_id: 'yudhadevsec/Sidiktaut'
+          
+          # 3. Jenis Repo (Space)
+          repo_type: 'space'
+          
+          # 4. Token (Namanya jadi hf_token)
+          hf_token: ${{ secrets.HF_TOKEN }}
+          
+          # 5. Folder yang mau dikirim (Namanya jadi subdirectory)
+          subdirectory: 'sidiktaut_web/backend'
