@@ -154,7 +154,7 @@ export const CliView = memo(function CliView() {
          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-full"><Play size={18} md:size={20}/></div> Contoh penggunaan</h3>
             <div className="w-full aspect-video bg-black/5 rounded-[15px] overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 relative group">
-                <iframe className="w-full h-full" src="https://www.youtube.com/embed/EKdWnPgZkxY" title="Tutorial Penggunaan CLI" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"></iframe>
+                <iframe className="w-full h-full" src="https://www.youtube.com/embed/5uE-h-3-3eU?si=iF-b8kk5iCv7Ma0g" title="Tutorial Penggunaan CLI" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"></iframe>
             </div>
             <div className="space-y-3 md:space-y-4">
                <CodeBlock title="scan standar" cmd="python sidiktaut.py -u google.com" />
