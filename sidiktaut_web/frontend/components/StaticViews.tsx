@@ -211,8 +211,8 @@ export const TeamView = memo(function TeamView() {
       full_desc: 'Bertanggung jawab melakukan pengujian fungsionalitas (Black Box Testing) pada ekstensi browser. Memastikan setiap fitur berjalan stabil, melaporkan bug, dan memverifikasi perbaikan untuk menjamin pengalaman pengguna yang bebas error.', 
       skills: ['Manual Testing', 'Bug Reporting', 'User Skenario'], 
       color: 'yellow',
-      github: 'https://github.com/',
-      linkedin: '',
+      github: 'https://github.com/chondhayam',
+      linkedin: 'https://instagram.com/chondha_',
       instagram: ''
     },
     { 
@@ -223,9 +223,9 @@ export const TeamView = memo(function TeamView() {
       full_desc: 'Bertanggung jawab melakukan pengujian tampilan (UI Testing) pada berbagai ukuran layar. Memastikan website berjalan responsif (Mobile-Friendly) dan melaporkan bug visual kepada Lead Developer.', 
       skills: ['Responsive Testing', 'Visual QC', 'Cross-Browser Check'], 
       color: 'green',
-      github: '',
-      linkedin: '',
-      instagram: ''
+      github: 'https://github.com/brrm438',
+      linkedin: 'https://linkedin.com/in/bram-lumozato-manao-9616a231b',
+      instagram: 'https://instagram.com/brammanaoo'
     }
   ];
 
