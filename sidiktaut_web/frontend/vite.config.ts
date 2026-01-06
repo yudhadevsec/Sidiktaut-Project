@@ -6,18 +6,23 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: '0.0.0.0', // Biar bisa diakses network lokal/localhost
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
+    host: '0.0.0.0', // Tetap pertahankan ini biar akses lokal gampang
+    // 🗑️ PROXY KITA HAPUS TOTAL (Karena kita sudah handle URL di api.ts)
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
+    }
+  },
+  // Tambahan penting buat Extension build (Opsional tapi Recommended)
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]'
+      }
     }
   }
 });

@@ -1,16 +1,19 @@
 import { ScanResponse } from "../types";
 
 // =================================================================
-// 🎚️ HYBRID MODE SWITCH (Pilih salah satu, comment yang tidak dipakai)
+// 🎚️ HYBRID MODE SWITCH
+// Ubah IS_DEV menjadi:
+// true  = Mode Development (Laptop Sendiri / Localhost)
+// false = Mode Production (Server PythonAnywhere)
 // =================================================================
 
-// [MODE 1] DEVELOPMENT (Localhost)
-// Gunakan ini saat develop di laptop sendiri
-// const API_BASE_URL = "http://localhost:5000";
+const IS_DEV = false; // <--- GANTI TRUE/FALSE DISINI SAJA
 
-// [MODE 2] PRODUCTION (PythonAnywhere)
-// Gunakan ini saat deploy ke Vercel atau demo ke dosen (Online)
-const API_BASE_URL = "https://yudhadevsec.pythonanywhere.com";
+const API_BASE_URL = IS_DEV 
+  ? "http://127.0.0.1:5000" 
+  : "https://yudhadevsec.pythonanywhere.com";
+
+console.log(`[SidikTaut] Mode: ${IS_DEV ? 'DEV (Local)' : 'PROD (Online)'}`);
 
 // =================================================================
 
@@ -39,11 +42,10 @@ export const scanUrl = async (url: string): Promise<ScanResponse> => {
   } catch (err: any) {
     console.error("[API Error]", err);
 
-    // Deteksi error khas PythonAnywhere (Whitelist Block)
     if (err.message.includes("403") || err.message.includes("Server Error")) {
        throw new Error("Gagal scan. Jika pakai PythonAnywhere Free, ingat hanya bisa scan situs Whitelist (Google, Youtube, dll).");
     }
 
-    throw new Error("Gagal terhubung ke Backend. Pastikan server nyala.");
+    throw new Error(`Gagal terhubung ke Backend (${IS_DEV ? 'Localhost' : 'Server'}). Pastikan server nyala.`);
   }
 };
