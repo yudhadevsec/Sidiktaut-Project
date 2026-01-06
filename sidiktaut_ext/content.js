@@ -1,285 +1,460 @@
 /**
- * SIDIKTAUT CONTENT SCRIPT (FINAL + OFFLINE DETECTION)
+ * SIDIKTAUT CONTENT SCRIPT (FINAL VERSION - TABS & ANTI-ERROR)
+ * Features:
+ * 1. Tampilan Mirip Web Dashboard (Tabs: Malicious, Clean, Undetected)
+ * 2. Auto-Retry jika Service Worker tidur (Fix Error Scan)
+ * 3. Style Modern (Card, Shadow, clean fonts)
  */
 
-const log = (msg) => console.log(`[SidikTaut Content] ${msg}`);
-
+// --- 1. INISIALISASI ---
 (async function init() {
   if (window.self !== window.top) return;
+  
+  // Cek validitas URL (Hanya http/https)
+  const url = window.location.href;
+  if (!url.startsWith("http://") && !url.startsWith("https://")) return;
 
   try {
+    // Cek koneksi ekstensi
+    if (!chrome.runtime?.id) return;
+
     const settings = await chrome.storage.sync.get(["sidik_ask_scan", "sidik_auto_scan"]);
     if (settings.sidik_auto_scan || settings.sidik_ask_scan === false) return;
 
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => setTimeout(injectPopup, 1000));
+      document.addEventListener("DOMContentLoaded", () => setTimeout(injectAskPopup, 1500));
     } else {
-      setTimeout(injectPopup, 1000);
+      setTimeout(injectAskPopup, 1500);
     }
   } catch (e) {
-    console.error("Init Error:", e);
+    // Silent fail jika context invalid
   }
 })();
 
-function injectPopup() {
+// --- 2. LISTENER DARI BACKGROUND ---
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "SHOW_DETAIL_OVERLAY") {
+    showDetailOverlay(request.data);
+  }
+});
+
+// --- 3. UTILS: SHADOW DOM ---
+function getOrCreateShadow() {
+  let container = document.getElementById("sidiktaut-root");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "sidiktaut-root";
+    document.body.appendChild(container);
+    const shadow = container.attachShadow({ mode: "open" });
+    const style = document.createElement("style");
+    style.textContent = getStyles(); // Mengambil CSS dari fungsi di bawah
+    shadow.appendChild(style);
+    return shadow;
+  }
+  return container.shadowRoot;
+}
+
+// --- 4. POPUP TANYA (TOAST KECIL) ---
+function injectAskPopup() {
   if (document.getElementById("sidiktaut-root")) return;
+  if (!chrome.runtime?.id) return;
 
-  const iconUrl = chrome.runtime.getURL("icon.png");
-  const container = document.createElement("div");
-  container.id = "sidiktaut-root";
-  const shadow = container.attachShadow({ mode: "open" });
-
-  const style = document.createElement("style");
-  style.textContent = `
-    .st-overlay { position: fixed; top: 24px; right: 24px; z-index: 2147483647; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; animation: slideIn 0.3s ease-out; }
-    .st-card { background: #1c1c1e; color: #fff; width: 320px; border-radius: 14px; padding: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); overflow: hidden; max-height: 80vh; display: flex; flex-direction: column; }
-    
-    .st-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-shrink: 0; }
-    .st-icon-box { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
-    .st-icon-box img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .st-title { font-weight: 700; font-size: 15px; margin: 0; color: white; }
-    
-    .st-content { flex-grow: 1; overflow-y: auto; } 
-    .st-desc { font-size: 13px; color: #aeaeb2; margin: 0 0 16px 0; line-height: 1.4; }
-    
-    .st-actions { display: flex; gap: 10px; margin-bottom: 10px; margin-top: auto; }
-    .st-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
-    
-    .btn-blue { background: #0a84ff; color: white; }
-    .btn-blue:hover { background: #0077ed; }
-    .btn-blue:disabled { opacity: 0.6; cursor: not-allowed; }
-    
-    .btn-gray { background: #3a3a3c; color: white; }
-    .btn-gray:hover { background: #48484a; }
-    
-    .btn-link { background: none; border: none; width: 100%; color: #8e8e93; font-size: 11px; cursor: pointer; padding: 6px; margin-top: 4px; }
-    .btn-link:hover { color: #aeaeb2; text-decoration: underline; }
-    
-    .text-safe { color: #32d74b !important; }
-    .text-danger { color: #ff453a !important; }
-
-    /* Styles Detail List */
-    .st-detail-list { margin-top: 10px; max-height: 300px; overflow-y: auto; border-top: 1px solid #333; padding-top: 10px; }
-    .st-vendor-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #2c2c2e; font-size: 12px; }
-    .st-vendor-name { font-weight: 600; color: #fff; }
-    .st-vendor-res { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-    .res-clean { background: rgba(50, 215, 75, 0.2); color: #32d74b; }
-    .res-malicious { background: rgba(255, 69, 58, 0.2); color: #ff453a; }
-    .st-empty { text-align: center; color: #666; font-size: 12px; padding: 20px; }
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #1c1c1e; }
-    ::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 3px; }
-
-    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: scale(0.95); } }
-  `;
+  const shadow = getOrCreateShadow();
+  
+  let iconUrl = "";
+  try { iconUrl = chrome.runtime.getURL("icon.png"); } catch(e) { return; }
 
   const wrapper = document.createElement("div");
-  wrapper.className = "st-overlay";
+  wrapper.className = "st-toast"; 
   
   wrapper.innerHTML = `
-    <div class="st-card" id="mainCard">
-      <div class="st-header">
-        <div class="st-icon-box"><img src="${iconUrl}" alt="SidikTaut"></div>
-        <h4 class="st-title" id="titleText">Verifikasi Keamanan</h4>
-      </div>
-      
-      <div class="st-content" id="contentArea">
-        <p class="st-desc" id="descText">Situs ini belum dipindai. Jalankan SidikTaut untuk mendeteksi ancaman?</p>
-      </div>
-
-      <div class="st-actions" id="btnGroup">
-        <button id="btnScan" class="st-btn btn-blue">Scan Sekarang</button>
-        <button id="btnClose" class="st-btn btn-gray">Tutup</button>
-      </div>
-      
-      <button id="btnNever" class="btn-link">Jangan tanya lagi untuk situs manapun</button>
+    <div class="st-toast-main">
+        <div class="st-toast-content">
+          <div class="st-toast-icon">
+            <img src="${iconUrl}" alt="ST">
+          </div>
+          <div class="st-toast-text">
+            <h4 class="st-font-bold" id="toastTitle">Verifikasi Keamanan</h4>
+            <p class="st-text-xs st-text-muted" id="toastDesc">Scan halaman ini sekarang?</p>
+          </div>
+        </div>
+        <div class="st-toast-actions">
+          <button id="btnScan" class="st-btn-primary-sm">Scan</button>
+          <button id="btnCloseMini" class="st-btn-icon-sm">&times;</button>
+        </div>
+    </div>
+    <div class="st-toast-footer">
+        <button id="btnNever" class="st-link-tiny">Jangan tanya lagi untuk situs manapun</button>
     </div>
   `;
 
-  shadow.appendChild(style);
   shadow.appendChild(wrapper);
-  document.body.appendChild(container);
 
   const ui = {
-    title: shadow.getElementById("titleText"),
-    desc: shadow.getElementById("descText"),
-    contentArea: shadow.getElementById("contentArea"),
     btnScan: shadow.getElementById("btnScan"),
-    btnClose: shadow.getElementById("btnClose"),
+    btnClose: shadow.getElementById("btnCloseMini"),
     btnNever: shadow.getElementById("btnNever"),
-    btnGroup: shadow.getElementById("btnGroup")
+    title: shadow.getElementById("toastTitle"),
+    desc: shadow.getElementById("toastDesc")
   };
 
-  // --- LOGIC UTAMA ---
-
-  ui.btnScan.onclick = () => {
-    // 1. CEK KONEKSI INTERNET (Anti Macet)
-    if (!navigator.onLine) {
-      ui.title.textContent = "Tidak Ada Internet";
-      ui.title.classList.add("text-danger");
-      ui.desc.textContent = "Gagal memindai. Pastikan perangkat Anda terhubung ke internet.";
-      return; 
-    }
-
-    // 2. Jika Online, Lanjut
-    ui.btnScan.textContent = "Menganalisis...";
-    ui.btnScan.disabled = true;
-    ui.btnClose.style.display = "none";
-    ui.btnNever.style.display = "none";
-
-    chrome.runtime.sendMessage({ action: "REQUEST_SCAN", url: window.location.href }, (response) => {
-      // Handle Runtime Error (Background mati)
-      if (chrome.runtime.lastError) {
-        ui.title.textContent = "Error Sistem";
-        ui.desc.textContent = "Ekstensi perlu dimuat ulang.";
-        return;
-      }
-      handleResult(response, ui, wrapper, shadow);
-    });
+  const closeToast = () => {
+      wrapper.style.opacity = '0';
+      wrapper.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+          const root = document.getElementById("sidiktaut-root");
+          if(root) root.remove();
+      }, 300);
   };
 
-  ui.btnClose.onclick = () => closePopup(wrapper);
-  ui.btnNever.onclick = () => {
-    chrome.storage.sync.set({ sidik_ask_scan: false }, () => closePopup(wrapper));
-  };
-}
-
-function handleResult(response, ui, wrapper, shadow) {
-  ui.btnGroup.innerHTML = ""; 
-
-  if (response && response.success) {
-    const data = response.data;
-    const isSafe = data.malicious === 0;
-
-    if (isSafe) {
-      ui.title.textContent = "✅ Link Aman";
-      ui.title.classList.add("text-safe");
-      ui.desc.textContent = `Aman. Reputasi VirusTotal: ${data.reputation}/100.`;
-    } else {
-      ui.title.textContent = "⚠️ BAHAYA";
-      ui.title.classList.add("text-danger");
-      ui.desc.textContent = `Peringatan! ${data.malicious} Vendor menandai situs ini berbahaya.`;
-    }
-
-    // Tombol Detail & Tutup
-    const btnDetail = document.createElement("button");
-    btnDetail.className = "st-btn btn-blue";
-    btnDetail.textContent = "Lihat Detail";
-    btnDetail.onclick = () => showDetailView(data, ui, wrapper, shadow);
-
-    const btnClose = document.createElement("button");
-    btnClose.className = "st-btn btn-gray";
-    btnClose.textContent = "Tutup";
-    btnClose.onclick = () => closePopup(wrapper);
-
-    ui.btnGroup.appendChild(btnDetail);
-    ui.btnGroup.appendChild(btnClose);
-
-  } else {
-    // Error Handling
-    ui.title.textContent = "Gagal Terhubung";
-    ui.title.classList.add("text-danger");
-    ui.desc.textContent = "Server backend tidak merespon.";
-    
-    const btnClose = document.createElement("button");
-    btnClose.className = "st-btn btn-gray";
-    btnClose.textContent = "Tutup";
-    btnClose.style.width = "100%";
-    btnClose.onclick = () => closePopup(wrapper);
-    ui.btnGroup.appendChild(btnClose);
-  }
-}
-
-function showDetailView(data, ui, wrapper, shadow) {
-  ui.title.textContent = "Detail Analisis";
-  ui.title.classList.remove("text-safe", "text-danger");
-
-  let listHtml = '<div class="st-detail-list">';
-  if (data.details && data.details.length > 0) {
-    const sortedDetails = data.details.sort((a, b) => {
-      const aBad = isBad(a.result);
-      const bBad = isBad(b.result);
-      return bBad - aBad; 
-    });
-
-    sortedDetails.forEach(v => {
-      const resultText = v.result || "Unknown";
-      const isMalicious = isBad(resultText);
-      const resClass = isMalicious ? "res-malicious" : "res-clean";
-
-      listHtml += `
-        <div class="st-vendor-row">
-          <span class="st-vendor-name">${v.engine_name}</span>
-          <span class="st-vendor-res ${resClass}">${resultText}</span>
-        </div>
-      `;
-    });
-  } else {
-    listHtml += '<div class="st-empty">Tidak ada data detail.</div>';
-  }
-  listHtml += '</div>';
-
-  ui.contentArea.innerHTML = listHtml;
-  ui.btnGroup.innerHTML = "";
-
-  const btnClose = document.createElement("button");
-  btnClose.className = "st-btn btn-gray";
-  btnClose.textContent = "Tutup";
-  btnClose.style.width = "100%";
-  btnClose.onclick = () => closePopup(wrapper);
+  ui.btnClose.onclick = closeToast;
   
-  ui.btnGroup.appendChild(btnClose);
-}
-
-function isBad(res) {
-  if(!res) return false;
-  const r = res.toLowerCase();
-  return r.includes("malicious") || r.includes("phishing") || r.includes("malware") || r.includes("suspicious");
-}
-
-function closePopup(element) {
-  element.style.animation = "fadeOut 0.2s forwards";
-  setTimeout(() => {
-    const root = document.getElementById("sidiktaut-root");
-    if (root) root.remove();
-  }, 200);
-}
-
-// Listener baru yang lebih stabil
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "SHOW_DETAIL_OVERLAY") {
-    let root = document.getElementById("sidiktaut-root");
-    
-    // 1. Jika overlay belum ada di halaman ini, buat dulu
-    if (!root) {
-      injectPopup();
-      root = document.getElementById("sidiktaut-root");
+  ui.btnNever.onclick = () => {
+      try {
+          chrome.storage.sync.set({ sidik_ask_scan: false }, closeToast);
+      } catch (e) { closeToast(); }
+  };
+  
+  // --- LOGIC SCAN ANTI-ERROR (PENTING!) ---
+  ui.btnScan.onclick = () => {
+    // 1. Cek Koneksi Internet
+    if (!navigator.onLine) {
+      ui.title.textContent = "Offline";
+      ui.title.style.color = "#ef4444";
+      ui.desc.textContent = "Cek koneksi internet Anda.";
+      return;
     }
 
-    const shadow = root.shadowRoot;
-    const overlay = shadow.querySelector(".st-overlay");
-    
-    // 2. Munculkan overlay & reset animasi agar segar kembali
-    overlay.style.display = "block";
-    const mainCard = shadow.getElementById("mainCard");
-    mainCard.style.animation = "none";
-    mainCard.offsetHeight; // trik agar animasi slideIn jalan lagi
-    mainCard.style.animation = "slideIn 0.3s ease-out";
+    // 2. Cek Koneksi Ekstensi (INI BIANG KEROK ERROR)
+    if (!chrome.runtime?.id) {
+        ui.title.textContent = "Terputus";
+        ui.title.style.color = "#ef4444";
+        ui.desc.textContent = "Koneksi usang. Mohon refresh halaman.";
+        ui.btnScan.textContent = "Refresh Page";
+        ui.btnScan.onclick = () => window.location.reload(); // Tombol berubah fungsi jadi Refresh
+        return;
+    }
 
-    // 3. Sembunyikan tombol "Jangan tanya lagi" (opsional agar UI lebih fokus)
-    const btnNever = shadow.getElementById("btnNever");
-    if (btnNever) btnNever.style.display = "none";
+    ui.btnScan.textContent = "Loading...";
+    ui.btnScan.disabled = true;
+    ui.btnNever.style.display = "none"; 
 
-    const uiElements = {
-      title: shadow.getElementById("titleText"),
-      desc: shadow.getElementById("descText"),
-      contentArea: shadow.getElementById("contentArea"),
-      btnGroup: shadow.getElementById("btnGroup")
-    };
+    // Kirim pesan ke Background
+    try {
+        chrome.runtime.sendMessage({ action: "REQUEST_SCAN", url: window.location.href }, (response) => {
+            
+            // 1. DETEKSI BACKGROUND MATI (Runtime Error)
+            if (chrome.runtime.lastError) {
+                console.warn("Service Worker Sleep, Retrying...", chrome.runtime.lastError);
+                ui.title.textContent = "Menghubungkan...";
+                
+                // COBA LAGI SETELAH 1 DETIK (Membangunkan Service Worker)
+                setTimeout(() => {
+                    try {
+                        chrome.runtime.sendMessage({ action: "REQUEST_SCAN", url: window.location.href }, (retryRes) => {
+                            if (retryRes && retryRes.success) {
+                                showDetailOverlay(retryRes.data);
+                            } else {
+                                ui.title.textContent = "Gagal";
+                                ui.title.style.color = "#ef4444";
+                                ui.desc.textContent = "Sistem sibuk/error. Coba reload halaman.";
+                                ui.btnScan.textContent = "Reload";
+                                ui.btnScan.disabled = false;
+                                ui.btnScan.onclick = () => window.location.reload();
+                            }
+                        });
+                    } catch(err) {
+                        ui.btnScan.textContent = "Reload";
+                        ui.btnScan.onclick = () => window.location.reload();
+                    }
+                }, 1500);
+                return;
+            }
 
-    // 4. Panggil fungsi detail yang sudah ada di content.js Anda
-    showDetailView(request.data, uiElements, overlay, shadow);
+            // 2. DETEKSI ERROR API
+            if (!response || !response.success) {
+                ui.title.textContent = "Gagal";
+                ui.title.style.color = "#ef4444";
+                ui.desc.textContent = response?.error || "Server sibuk.";
+                ui.btnScan.textContent = "Tutup";
+                ui.btnScan.disabled = false;
+                ui.btnScan.onclick = closeToast;
+                return;
+            }
+
+            // 3. SUKSES
+            showDetailOverlay(response.data);
+        });
+    } catch (e) {
+        ui.title.textContent = "Error";
+        ui.desc.textContent = "Koneksi terputus. Refresh halaman.";
+        ui.btnScan.textContent = "Refresh";
+        ui.btnScan.onclick = () => window.location.reload();
+    }
+  };
+}
+
+// --- 5. OVERLAY DETAIL (MODAL BESAR DENGAN TABS) ---
+function showDetailOverlay(data) {
+  const shadow = getOrCreateShadow();
+  
+  // Bersihkan elemen lama
+  const oldWrapper = shadow.querySelector(".st-overlay-backdrop"); 
+  const oldToast = shadow.querySelector(".st-toast");
+  if (oldWrapper) oldWrapper.remove();
+  if (oldToast) oldToast.remove();
+
+  const malicious = data.malicious || 0;
+  const harmless = data.harmless || 0;
+  const undetected = data.undetected || 0;
+
+  // --- RENDER LIST SESUAI KATEGORI (TABS) ---
+  const renderList = (category) => {
+      const listContainer = shadow.getElementById('listContainer');
+      if (!listContainer) return;
+
+      if (!data.details || data.details.length === 0) {
+          listContainer.innerHTML = `<div class="st-empty-state">Tidak ada data detail.</div>`;
+          return;
+      }
+
+      // Filter Data berdasarkan Tab
+      const filtered = data.details.filter(v => {
+          const res = (v.result || "unknown").toLowerCase();
+          const isBad = ["malicious", "phishing", "malware", "suspicious"].some(k => res.includes(k));
+          const isClean = ["clean", "harmless", "safe"].some(k => res.includes(k));
+          
+          if (category === 'malicious') return isBad; 
+          if (category === 'harmless') return isClean; 
+          if (category === 'undetected') return !isBad && !isClean; 
+          return true;
+      });
+
+      if (filtered.length === 0) {
+          listContainer.innerHTML = `<div class="st-empty-state">Aman. Tidak ada deteksi di kategori ini.</div>`;
+          return;
+      }
+
+      // Render HTML List (Style Rapi Lurus ke Bawah)
+      listContainer.innerHTML = filtered.map(v => {
+          const res = (v.result || "Unknown").toLowerCase();
+          const isBad = ["malicious", "phishing", "malware", "suspicious"].some(k => res.includes(k));
+          const isClean = ["clean", "harmless", "safe"].some(k => res.includes(k));
+          
+          let rowClass = "row-default";
+          let iconHtml = `<span class="st-icon-gray">?</span>`;
+          let textClass = "text-gray";
+          let badgeClass = "badge-gray";
+
+          if (isBad) {
+              rowClass = "row-danger";
+              // Icon Merah
+              iconHtml = `<svg class="st-icon-danger" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+              textClass = "text-danger";
+              badgeClass = "badge-danger";
+          } else if (isClean) {
+              rowClass = "row-safe";
+              // Icon Hijau
+              iconHtml = `<svg class="st-icon-safe" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+              textClass = "text-safe";
+              badgeClass = "badge-safe";
+          }
+
+          return `
+              <div class="st-row ${rowClass}">
+                  <div class="st-row-left">
+                     ${iconHtml}
+                     <span class="st-vendor-name ${textClass}">${v.engine_name}</span>
+                  </div>
+                  <div class="st-badge-pill ${badgeClass}">
+                      ${v.result}
+                  </div>
+              </div>
+          `;
+      }).join("");
+  };
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "st-overlay-backdrop"; 
+  
+  // HTML STRUKTUR (DENGAN TOMBOL TABS)
+  wrapper.innerHTML = `
+    <div class="st-modal">
+        <div class="st-modal-header">
+            <div class="st-modal-title-group">
+                <svg class="st-icon-shield" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <h3>Detail Analisis</h3>
+            </div>
+            <button id="btnCloseDetail" class="st-btn-close">&times;</button>
+        </div>
+
+        <div class="st-stats-bar">
+            <div id="tabMalicious" class="st-stat-pill ${malicious > 0 ? 'pill-active' : ''}" style="cursor:pointer">
+                <span>Malicious</span>
+                <span class="st-stat-count">${malicious}</span>
+            </div>
+            <div id="tabHarmless" class="st-stat-pill" style="cursor:pointer">
+                <span>Clean</span>
+                <span class="st-stat-count">${harmless}</span>
+            </div>
+            <div id="tabUndetected" class="st-stat-pill" style="cursor:pointer">
+                <span>Undetected</span>
+                <span class="st-stat-count">${undetected}</span>
+            </div>
+        </div>
+
+        <div id="listContainer" class="st-modal-body custom-scrollbar">
+            </div>
+    </div>
+  `;
+
+  shadow.appendChild(wrapper);
+
+  // --- LOGIC CLICK TABS ---
+  const tabMal = shadow.getElementById('tabMalicious');
+  const tabSafe = shadow.getElementById('tabHarmless');
+  const tabUn = shadow.getElementById('tabUndetected');
+
+  const switchTab = (activeBtn, category) => {
+      [tabMal, tabSafe, tabUn].forEach(btn => btn.classList.remove('pill-active'));
+      activeBtn.classList.add('pill-active');
+      renderList(category);
+  };
+
+  tabMal.onclick = () => switchTab(tabMal, 'malicious');
+  tabSafe.onclick = () => switchTab(tabSafe, 'harmless');
+  tabUn.onclick = () => switchTab(tabUn, 'undetected');
+
+  // Default Tab Logic: Tampilkan Malicious jika ada, kalau tidak Clean
+  if (malicious > 0) {
+      renderList('malicious');
+  } else {
+      switchTab(tabSafe, 'harmless');
   }
-});
+
+  const closeFunc = () => {
+      wrapper.style.opacity = '0';
+      wrapper.style.transform = 'translateX(20px)';
+      setTimeout(() => {
+          const root = document.getElementById("sidiktaut-root");
+          if(root) root.remove();
+      }, 200);
+  };
+  
+  shadow.getElementById("btnCloseDetail").onclick = closeFunc;
+  wrapper.onclick = (e) => { 
+      if (e.target === wrapper) closeFunc();
+  };
+}
+
+// --- 6. CSS LENGKAP (Styling User + Fixes) ---
+function getStyles() {
+  return `
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+    
+    @keyframes slideInRight { 
+        from { transform: translateX(50px); opacity: 0; } 
+        to { transform: translateX(0); opacity: 1; } 
+    }
+
+    /* TOAST */
+    .st-toast { 
+        position: fixed; top: 24px; right: 24px; z-index: 2147483647; 
+        background: #ffffff; width: 340px; border-radius: 16px; 
+        padding: 16px; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15); 
+        border: 1px solid #f3f4f6;
+        display: flex; flex-direction: column; gap: 12px;
+        animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.3s ease;
+    }
+    
+    .st-toast-main { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .st-toast-content { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .st-toast-icon { width: 38px; height: 38px; background: #eff6ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .st-toast-icon img { width: 22px; height: 22px; }
+    .st-toast-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #111827; }
+    .st-toast-text p { margin: 2px 0 0; font-size: 12px; color: #6b7280; line-height: 1.3; }
+    
+    .st-toast-actions { display: flex; align-items: center; gap: 8px; }
+    .st-toast-footer { border-top: 1px solid #f3f4f6; padding-top: 8px; text-align: center; }
+    .st-link-tiny { background: none; border: none; font-size: 11px; color: #9ca3af; cursor: pointer; text-decoration: none; transition: 0.2s; }
+    .st-link-tiny:hover { color: #6b7280; text-decoration: underline; }
+
+    .st-btn-primary-sm { background: #2563eb; color: white; border: none; padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .st-btn-primary-sm:hover { background: #1d4ed8; }
+    .st-btn-primary-sm:disabled { background: #93c5fd; cursor: not-allowed; }
+    .st-btn-icon-sm { background: transparent; border: none; font-size: 18px; color: #d1d5db; cursor: pointer; }
+    .st-btn-icon-sm:hover { color: #4b5563; }
+
+    /* OVERLAY BACKDROP */
+    .st-overlay-backdrop { 
+        position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; 
+        background: rgba(0,0,0,0.1); z-index: 9999999; 
+        display: flex; justify-content: flex-end; align-items: flex-start; 
+        padding: 24px; transition: 0.2s;
+    }
+
+    /* MODAL */
+    .st-modal { 
+        background: #ffffff; width: 400px; max-height: 90vh; 
+        border-radius: 24px; display: flex; flex-direction: column; 
+        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25); 
+        animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid #e5e7eb;
+    }
+
+    .st-modal-header { padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 24px 24px 0 0; }
+    .st-modal-title-group { display: flex; align-items: center; gap: 10px; }
+    .st-icon-shield { color: #2563eb; }
+    .st-modal-header h3 { margin: 0; font-size: 17px; font-weight: 800; color: #111827; letter-spacing: -0.3px; }
+    .st-btn-close { background: #fef2f2; border: 1px solid #fee2e2; color: #ef4444; width: 30px; height: 30px; border-radius: 10px; font-size: 18px; cursor: pointer; line-height: 1; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .st-btn-close:hover { background: #ef4444; color: white; border-color: #ef4444; }
+
+    /* STATS TABS */
+    .st-stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 24px 18px; background: #fff; }
+    .st-stat-pill { background: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; color: #6b7280; transition: all 0.2s; }
+    .st-stat-pill:hover { background: #f3f4f6; border-color: #e5e7eb; }
+    .st-stat-count { font-size: 15px; font-weight: 800; color: #1f2937; margin-top: 4px; }
+    
+    .pill-active { background: #fff1f2; border-color: #ffe4e6; color: #e11d48; }
+    .pill-active .st-stat-count { color: #be123c; }
+
+    /* LIST CONTENT */
+    .st-modal-body { 
+        flex: 1; overflow-y: auto; padding: 18px 24px; 
+        background: #fff; display: flex; flex-direction: column; gap: 8px;
+        border-radius: 0 0 24px 24px;
+        border-top: 1px solid #f3f4f6; 
+    }
+
+    .st-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; width: 100%; border-radius: 12px; border: 1px solid transparent; transition: 0.2s; }
+    .st-row-left { display: flex; align-items: center; gap: 10px; overflow: hidden; flex: 1; }
+    .st-vendor-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    .st-badge-pill { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; flex-shrink: 0; }
+
+    .row-danger { background: #fef2f2; border-color: #fee2e2; }
+    .text-danger { color: #1f2937; }
+    .badge-danger { background: #fee2e2; color: #ef4444; }
+
+    .row-safe { background: #ecfdf5; border-color: #d1fae5; }
+    .text-safe { color: #1f2937; }
+    .badge-safe { background: #d1fae5; color: #059669; }
+
+    .row-default { background: #f9fafb; border-color: #f3f4f6; }
+    .text-gray { color: #4b5563; }
+    .badge-gray { background: #e5e7eb; color: #6b7280; }
+
+    .st-icon-danger { color: #ef4444; flex-shrink: 0; }
+    .st-icon-safe { color: #10b981; flex-shrink: 0; }
+    .st-icon-gray { color: #9ca3af; font-weight: bold; width: 16px; text-align: center; flex-shrink: 0; }
+
+    .st-empty-state { text-align: center; color: #9ca3af; font-size: 13px; padding: 40px; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+  `;
+}
