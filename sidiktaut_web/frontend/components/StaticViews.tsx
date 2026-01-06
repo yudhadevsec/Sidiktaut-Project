@@ -206,7 +206,7 @@ export const TeamView = memo(function TeamView() {
     { 
       name: 'Gyelgha Chonda', 
       role: 'Extension Quality Assurance', 
-      image: '/chonda.jpg', 
+      image: '/chonda.jpeg', 
       short_desc: 'Extension Testing & Bug Hunting.', 
       full_desc: 'Bertanggung jawab melakukan pengujian fungsionalitas (Black Box Testing) pada ekstensi browser. Memastikan setiap fitur berjalan stabil, melaporkan bug, dan memverifikasi perbaikan untuk menjamin pengalaman pengguna yang bebas error.', 
       skills: ['Manual Testing', 'Bug Reporting', 'User Skenario'], 
