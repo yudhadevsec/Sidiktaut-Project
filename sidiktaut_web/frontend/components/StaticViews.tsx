@@ -36,7 +36,7 @@ function FeatureCard({ icon: Icon, title, desc }: any) {
 
 // Bagian tampilan Sidiktaut Extension
 export const BrowserView = memo(function BrowserView() {
-  const handleDownloadZip = () => { const link = document.createElement('a'); link.href = '/sidiktaut-ext.zip'; link.download = 'sidiktaut-ext.zip'; link.click(); };
+  const handleDownloadZip = () => { const link = document.createElement('a'); link.href = '/Sidiktaut-Extension.zip'; link.download = 'Sidiktaut-Extension.zip'; link.click(); };
 
   return (
     <div className="space-y-6 md:space-y-8 pb-12">
@@ -106,7 +106,7 @@ export const CliView = memo(function CliView() {
     tux: { mobile: "absolute bottom-[265px] right-[15px] w-[100px] h-[90px] rotate-[5deg]", desktop: "md:absolute md:top-[130px] md:-translate-y-[40px] md:right-[330px] md:w-56 md:h-56 md:rotate-[6deg]" },
     python: { mobile: "absolute bottom-[-10px] right-[-20px] w-[200px] h-[200px] rotate-[5deg]", desktop: "md:absolute md:top-1/2 md:-translate-y-1/2 md:-right-10 md:w-[400px] md:h-[400px] md:rotate-[5deg]" }
   };
-  const handleDownloadCli = () => { const link = document.createElement('a'); link.href = '/sidiktaut-cli.zip'; link.download = 'sidiktaut-cli.zip'; link.click(); };
+  const handleDownloadCli = () => { const link = document.createElement('a'); link.href = '/Sidiktaut-Cli.zip'; link.download = 'Sidiktaut-Cli.zip'; link.click(); };
   const copyInstall = () => { navigator.clipboard.writeText('python sidiktaut.py'); setInstallCopied(true); setTimeout(() => setInstallCopied(false), 2000); }
 
   return (
