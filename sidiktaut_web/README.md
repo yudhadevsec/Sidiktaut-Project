@@ -1,97 +1,89 @@
-SidikTaut adalah aplikasi web untuk mendeteksi keamanan sebuah tautan (URL). Aplikasi ini menggunakan **VirusTotal API** untuk mengecek apakah sebuah link mengandung Phishing, Malware, atau ancaman siber lainnya.
+# 🌐 SidikTaut Web (Dashboard)
 
-Project ini terdiri dari dua bagian utama:
-1.  **Backend (Python Flask):** Mengurus logika API, Caching, dan Hashing.
-2.  **Frontend (React + Vite):** Sebagai tampilan / visual yang interaktif
-
----
-
-## Dependencies
-
-Sebelum mulai, pastikan di laptop kamu sudah terinstall:
-1.  **Python** (versi 3.8 ke atas) → Buat menjalankan backend.
-2.  **Node.js** (versi 16 ke atas) → Buat jalanin Frontend.
+**SidikTaut Web** adalah antarmuka visual (GUI) utama untuk menganalisis keamanan tautan. Bagian ini terdiri dari dua komponen yang harus dijalankan secara bersamaan:
+1.  **Backend (Python Flask):** Otak sistem yang terhubung ke VirusTotal.
+2.  **Frontend (React + Vite):** Tampilan antarmuka yang digunakan pengguna.
 
 ---
 
-## 🚀 Cara Instalasi & Menjalankan
+## 🛠️ Persiapan (Dependencies)
 
-Ikuti langkah ini step by step agar program tidak error. Kita akan membutuhkan 2 Terminal untuk menjalankan web.
+Pastikan di komputer kamu sudah terinstall:
+* **Python** (v3.8 ke atas)
+* **Node.js** (v16 ke atas)
 
-### Langkah 1: Menyalakan Backend.
+---
 
-Backend bertugas mengambil data dari VirusTotal.
+## 🚀 Cara Menjalankan (Step-by-Step)
 
-1.  Buka terminal di VS Code.
-2.  Masuk ke folder backend:
+Untuk menjalankan web ini, kamu membutuhkan **2 Terminal** yang aktif bersamaan.
+
+### TERMINAL 1: Menyalakan Backend 🐍
+
+Backend bertugas memproses data. Jangan tutup terminal ini selama web digunakan.
+
+1.  Buka terminal, masuk ke folder backend:
     ```bash
-    cd sidiktaut_web/backend
+    cd backend
     ```
-3.  Install library Python yang dibutuhkan (cukup sekali aja):
+2.  Install library Python (hanya perlu sekali di awal):
     ```bash
     pip install -r requirements.txt
     ```
-4.  **PENTING:** Buat file baru bernama `.env` di dalam folder `backend/`, lalu isi dengan API Key VirusTotal kamu:
+3.  **WAJIB:** Buat file baru bernama `.env` di dalam folder `backend/`, lalu isi dengan API Key VirusTotal kamu:
     ```text
-    VT_API_KEY=masukkan_kunci_api_virustotal_disini
+    VT_API_KEY=masukkan_api_key_kamu_disini
+    FLASK_DEBUG=True
+    PORT=5000
     ```
-5.  Jalankan server:
+4.  Jalankan server:
     ```bash
     python app.py
     ```
-    ✅ *Indikator Sukses:* Muncul tulisan `Running on http://127.0.0.1:5000`.
-    ⚠️ **Jangan tutup terminal ini!** Jangan tutup/berhentikan terminal ini. Karena sebagai syarat pertama untuk menjalankan web
+    ✅ **Indikator Sukses:** Muncul tulisan `Running on http://127.0.0.1:5000`.
 
 ---
 
-### Langkah 2: Menyalakan Frontend
+### TERMINAL 2: Menyalakan Frontend ⚛️
 
-Buka **Terminal Baru** (klik tombol `+` di terminal VS Code) untuk menjalankan tampilan web.
+Buka terminal baru (klik tombol `+` di terminal VS Code) untuk menjalankan tampilan web.
 
-1.  Pastikan posisi terminal ada di root folder (sejajar dengan package.json), lalu install library Javascript:
+1.  Masuk ke folder frontend:
+    ```bash
+    cd frontend
+    ```
+2.  Install library JavaScript (hanya perlu sekali di awal):
     ```bash
     npm install
     ```
-2.  Jalankan web di localhost.
+3.  Jalankan web:
     ```bash
     npm run dev
     ```
-    ✅ *Indikator Sukses:* Muncul tulisan `Local: http://localhost:3000`.
+    ✅ **Indikator Sukses:** Muncul tulisan `Local: http://localhost:3000`.
 
 ---
 
-## Cara menggunakan
+## 📖 Cara Menggunakan
 
-1.  Buka browser apapun (contoh: chrome)
-2.  Ketik alamat: **`http://localhost:3000`**
-3.  **Coba Scan:**
-    * Copy link yang mencurigakan (atau link aman seperti `google.com`).
-    * Paste di kolom input.
-    * Klik tombol **SCAN**.
-4.  **Lihat Hasil:**
-    * Jika link baru, web akan loading sekitar 3 detik (Web sedang request ke virus total karena link belum pernah di scan sebelumnya)
-    * Jika link sudah pernah discan, hasil muncul instan (Fitur Caching).
+1.  Buka browser (Chrome/Edge/Firefox).
+2.  Akses alamat: **`http://localhost:3000`**
+3.  Masukkan link yang ingin diperiksa di kolom pencarian.
+4.  Klik tombol **SCAN**.
+    * *Scan Awal:* Butuh waktu 3-5 detik (Request ke API).
+    * *Scan Ulang:* Instan (Mengambil data dari Cache).
 
 ---
 
-## Teknologi yang digunakan
+## ❓ Solusi Masalah (Troubleshooting)
 
-* **Bahasa:** Python (Backend), TypeScript/React (Frontend).
-* **Algoritma:** Hash Map ($O(1)$ lookup) untuk efisiensi caching.
-* **Keamanan:** SHA-256 Hashing untuk integritas data URL.
-* **Styling:** Tailwind CSS (Modern UI).
+* **Error "Network Error" saat Scan:**
+    Cek **Terminal 1 (Backend)**. Pastikan server Python masih menyala dan tidak error. Frontend tidak bisa bekerja tanpa Backend.
 
----
+* **Error "Module not found":**
+    Artinya ada library yang belum terinstall.
+    * Di Backend: Jalankan `pip install -r requirements.txt`
+    * Di Frontend: Jalankan `npm install`
 
-## Troubleshooting (Jika ada error)
-
-* **Error: "Network Error" saat Scan:**
-    Cek terminal Backend. Pastikan `python app.py` masih jalan dan tidak mati. Frontend butuh Backend untuk bekerja.
-    
-* **Error: "Module not found" (Flask/React):**
-    Berarti kamu lupa install library.
-    * Di Backend: ketik `pip install -r requirements.txt`
-    * Di Frontend: ketik `npm install`
-
-* **Web Tampilannya Putih/Kosong:**
-    Coba refresh browser atau restart perintah `npm run dev`.
+* **Tampilan Web Kosong/Putih:**
+    Coba refresh browser atau matikan Frontend di Terminal 2 (`Ctrl+C`), lalu jalankan ulang `npm run dev`.

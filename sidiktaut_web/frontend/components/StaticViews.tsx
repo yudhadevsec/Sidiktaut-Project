@@ -205,15 +205,15 @@ export const TeamView = memo(function TeamView() {
     },
     { 
       name: 'Gyelgha Chonda', 
-      role: 'Extension Quality Assurance', 
+      role: 'Extension Specialist & Quality Assurance', 
       image: '/chonda.jpeg', 
       short_desc: 'Extension Testing & Bug Hunting.', 
       full_desc: 'Bertanggung jawab melakukan pengujian fungsionalitas (Black Box Testing) pada ekstensi browser. Memastikan setiap fitur berjalan stabil, melaporkan bug, dan memverifikasi perbaikan untuk menjamin pengalaman pengguna yang bebas error.', 
-      skills: ['Manual Testing', 'Bug Reporting', 'User Skenario'], 
+      skills: ['Manual Testing', 'Bug Reporting', 'User Skenario', 'Black Box Testing'], 
       color: 'yellow',
       github: 'https://github.com/chondhayam',
-      linkedin: 'https://instagram.com/chondha_',
-      instagram: ''
+      linkedin: '',
+      instagram: 'https://instagram.com/chondha_'
     },
     { 
       name: 'Bram Lumozato M.', 
@@ -221,7 +221,7 @@ export const TeamView = memo(function TeamView() {
       image: '/bram.jpg', 
       short_desc: 'Web Interface & Responsive Testing.', 
       full_desc: 'Bertanggung jawab melakukan pengujian tampilan (UI Testing) pada berbagai ukuran layar. Memastikan website berjalan responsif (Mobile-Friendly) dan melaporkan bug visual kepada Lead Developer.', 
-      skills: ['Responsive Testing', 'Visual QC', 'Cross-Browser Check'], 
+      skills: ['Responsive Testing', 'Visual QC', 'Cross-Browser Check', 'Black Box Testing'], 
       color: 'green',
       github: 'https://github.com/brrm438',
       linkedin: 'https://linkedin.com/in/bram-lumozato-manao-9616a231b',
