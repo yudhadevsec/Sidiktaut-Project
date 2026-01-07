@@ -48,15 +48,21 @@ Backend bertugas memproses data. Jangan tutup terminal ini selama web digunakan.
 
 Buka terminal baru atau terminal kedua (klik tombol `+` di terminal VS Code) untuk menjalankan tampilan web.
 
-1.  Masuk ke folder frontend:
+1. Masuk ke folder frontend/services/api.ts:
+   Ubah dari false menjadi true seperti dibawah
+    ```bash
+    const IS_DEV = true;
+    ```
+2.  Masuk ke folder frontend:
     ```bash
     cd frontend
     ```
-2.  Install library JavaScript (hanya perlu sekali di awal):
+
+3.  Install library JavaScript (hanya perlu sekali di awal):
     ```bash
     npm install
     ```
-3.  Jalankan web:
+4.  Jalankan web:
     ```bash
     npm run dev
     ```
