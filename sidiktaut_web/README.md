@@ -1,12 +1,12 @@
-# 🌐 SidikTaut Web (Dashboard)
+# SidikTaut Web
 
-**SidikTaut Web** adalah antarmuka visual (GUI) utama untuk menganalisis keamanan tautan. Bagian ini terdiri dari dua komponen yang harus dijalankan secara bersamaan:
+**SidikTaut Web** adalah program utama untuk menganalisis keamanan tautan. Bagian ini terdiri dari dua komponen yang harus dijalankan secara bersamaan:
 1.  **Backend (Python Flask):** Otak sistem yang terhubung ke VirusTotal.
-2.  **Frontend (React + Vite):** Tampilan antarmuka yang digunakan pengguna.
+2.  **Frontend (React + Vite):** Tampilan interface yang digunakan pengguna.
 
 ---
 
-## 🛠️ Persiapan (Dependencies)
+## Persiapan (Dependencies)
 
 Pastikan di komputer kamu sudah terinstall:
 * **Python** (v3.8 ke atas)
@@ -14,11 +14,11 @@ Pastikan di komputer kamu sudah terinstall:
 
 ---
 
-## 🚀 Cara Menjalankan (Step-by-Step)
+## Cara Menjalankan (Step-by-Step)
 
 Untuk menjalankan web ini, kamu membutuhkan **2 Terminal** yang aktif bersamaan.
 
-### TERMINAL 1: Menyalakan Backend 🐍
+### TERMINAL 1: Menyalakan Backend
 
 Backend bertugas memproses data. Jangan tutup terminal ini selama web digunakan.
 
@@ -40,13 +40,13 @@ Backend bertugas memproses data. Jangan tutup terminal ini selama web digunakan.
     ```bash
     python app.py
     ```
-    ✅ **Indikator Sukses:** Muncul tulisan `Running on http://127.0.0.1:5000`.
+   **✅ Indikator Sukses:** Jika berhasil, Muncul tulisan `Running on http://127.0.0.1:5000`.
 
 ---
 
-### TERMINAL 2: Menyalakan Frontend ⚛️
+### TERMINAL 2: Menyalakan Frontend
 
-Buka terminal baru (klik tombol `+` di terminal VS Code) untuk menjalankan tampilan web.
+Buka terminal baru atau terminal kedua (klik tombol `+` di terminal VS Code) untuk menjalankan tampilan web.
 
 1.  Masuk ke folder frontend:
     ```bash
@@ -60,11 +60,11 @@ Buka terminal baru (klik tombol `+` di terminal VS Code) untuk menjalankan tampi
     ```bash
     npm run dev
     ```
-    ✅ **Indikator Sukses:** Muncul tulisan `Local: http://localhost:3000`.
+    ✅ **Indikator Sukses:** Jika berhasil Muncul tulisan `Local: http://localhost:3000`.
 
 ---
 
-## 📖 Cara Menggunakan
+## Cara Menggunakan
 
 1.  Buka browser (Chrome/Edge/Firefox).
 2.  Akses alamat: **`http://localhost:3000`**
@@ -75,7 +75,7 @@ Buka terminal baru (klik tombol `+` di terminal VS Code) untuk menjalankan tampi
 
 ---
 
-## ❓ Solusi Masalah (Troubleshooting)
+## Solusi Masalah (Troubleshooting)
 
 * **Error "Network Error" saat Scan:**
     Cek **Terminal 1 (Backend)**. Pastikan server Python masih menyala dan tidak error. Frontend tidak bisa bekerja tanpa Backend.
