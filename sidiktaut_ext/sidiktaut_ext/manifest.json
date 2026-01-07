@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "SidikTaut Extension- Link Analyzer",
+  "version": "0.1",
+  "description": "Ekstensi ringan untuk Chrome atau browser favoritmu. Analisis Satset tanpa Ribet.",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "contextMenus",
+    "notifications",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://yudhadevsec.pythonanywhere.com/*",
+    "http://127.0.0.1:5000/*",
+    "http://localhost:5000/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icon.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

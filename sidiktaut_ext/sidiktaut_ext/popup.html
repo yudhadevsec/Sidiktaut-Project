@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SidikTaut</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+  <div class="container">
+
+    <div class="header">
+      <div class="brand">
+        <img src="icon.png" alt="Logo" class="brand-icon">
+        <h3>SidikTaut</h3>
+      </div>
+
+      <div class="actions">
+        <span id="statusBadge" class="badge">READY</span>
+        <button id="themeBtn" class="theme-btn" title="Ganti Tema">
+          </button>
+      </div>
+    </div>
+
+    <label for="urlInput" class="label">Target URL</label>
+    <input id="urlInput" placeholder="http://example.com" />
+
+    <button id="scanBtn" class="primary">SCAN SEKARANG</button>
+
+    <div id="resultArea" class="hidden">
+      <div class="result-header">
+        <div>
+           <p class="score"><span id="scoreText">0</span> Deteksi</p>
+           <p id="verdictText" class="verdict">Menganalisis...</p>
+        </div>
+      </div>
+
+      <div class="vendor-section">
+        <h4 class="vendor-title">🔍 Detail Analisis (VirusTotal)</h4>
+        <div id="vendorList" class="vendor-list">
+          </div>
+      </div>
+    </div>
+
+    <p id="errorMsg" class="error hidden"></p>
+
+    <div class="settings">
+      <h4>Pengaturan</h4>
+      <label class="setting-row">
+        <span>Tanya sebelum scan (Pop-up)</span>
+        <input type="checkbox" id="askScanToggle">
+      </label>
+    </div>
+
+    <div class="footer">
+      <a href="https://sidiktaut.vercel.app" target="_blank">Buka Dashboard →</a>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
