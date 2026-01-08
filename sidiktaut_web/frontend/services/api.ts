@@ -2,12 +2,11 @@ import { ScanResponse } from "../types";
 
 // =================================================================
 // 🎚️ HYBRID MODE SWITCH
-// Ubah IS_DEV menjadi:
-// true  = Mode Development (Laptop Sendiri / Localhost)
-// false = Mode Production (Server PythonAnywhere)
 // =================================================================
 
-const IS_DEV = false; // <--- GANTI TRUE/FALSE DISINI SAJA
+// GANTI JADI 'true'  -> Kalau mau demo pakai Laptop (Localhost)
+// GANTI JADI 'false' -> Kalau mau demo pakai Website Online
+const IS_DEV = false;
 
 const API_BASE_URL = IS_DEV 
   ? "http://127.0.0.1:5000" 
@@ -32,6 +31,7 @@ export const scanUrl = async (url: string): Promise<ScanResponse> => {
 
       try {
         const errorData = await res.json();
+        // Ini kuncinya! Kita ambil pesan error asli dari Backend
         if (errorData.error) errorMessage = errorData.error;
       } catch {}
 
@@ -42,10 +42,12 @@ export const scanUrl = async (url: string): Promise<ScanResponse> => {
   } catch (err: any) {
     console.error("[API Error]", err);
 
-    if (err.message.includes("403") || err.message.includes("Server Error")) {
-       throw new Error("Gagal scan. Jika pakai PythonAnywhere Free, ingat hanya bisa scan situs Whitelist (Google, Youtube, dll).");
-    }
+    // [MODIFIKASI] Bagian ini saya hapus/komentar biar pesan "Access Denied" dari backend MUNCUL.
+    // if (err.message.includes("403") || err.message.includes("Server Error")) {
+    //    throw new Error("Gagal scan. Jika pakai PythonAnywhere Free...");
+    // }
 
-    throw new Error(`Gagal terhubung ke Backend (${IS_DEV ? 'Localhost' : 'Server'}). Pastikan server nyala.`);
+    // Kita lempar error apa adanya (biar pesan dari backend kelihatan di layar)
+    throw new Error(err.message || `Gagal terhubung ke Backend (${IS_DEV ? 'Localhost' : 'Server'}). Pastikan server nyala.`);
   }
 };
