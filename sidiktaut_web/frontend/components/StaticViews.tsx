@@ -72,7 +72,7 @@ export const BrowserView = memo(function BrowserView() {
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full"><FileText size={18} md:size={20} /></div> Cara Menginstall</h3>
           <div className="w-full aspect-video bg-black/5 rounded-[15px] overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 relative group">
-            <iframe className="w-full h-full" src="https://www.youtube.com/embed/EKdWnPgZkxY" title="Tutorial Install Extension" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"></iframe>
+            <iframe className="w-full h-full" src="https://www.youtube.com/embed/" title="Tutorial Install Extension" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"></iframe>
           </div>
           <div className="bg-white dark:bg-[#121214] rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6 md:space-y-8">
             <StepItem number="1" title="Download & Ekstrak">Unduh file <code>sidiktaut-ext.zip</code> dari tombol di atas, lalu ekstrak ke folder komputer kamu.</StepItem>
