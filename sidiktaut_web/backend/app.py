@@ -15,7 +15,7 @@ import urllib3
 import socket
 import ipaddress
 
-# 1. Matikan Warning SSL
+# 1. Matikan Warning SSL (Penting untuk scanning situs malware)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load env variables
@@ -48,32 +48,31 @@ HEADERS_UA = {
 }
 
 # ==============================================================================
-# SECURITY LOGIC (YANG DIBENERIN BIAR LURUS)
+# SECURITY LOGIC (SSRF PROTECTION)
 # ==============================================================================
 
 def is_safe_target(url):
     """
-    Fungsi Satpam Galak: Cek apakah IP tujuan aman.
+    Fungsi Satpam Galak: Cek apakah IP tujuan aman (Bukan Localhost/Private IP).
     """
     try:
-        # 1. Bersihkan URL dari spasi dan protokol ganda
+        # 1. Bersihkan URL
         url = url.strip()
         
-        # Ambil hanya domain/IP-nya saja (buang http:// atau https://)
-        # Contoh: http://localhost:5000 -> localhost
+        # Ambil hostname
         parsed = urlparse(url)
         hostname = parsed.hostname
 
-        # Fallback jika urlparse gagal ambil hostname (misal input mentah: localhost:5000)
+        # Fallback jika urlparse gagal
         if not hostname:
             if "://" not in url:
                 temp_url = "http://" + url
                 hostname = urlparse(temp_url).hostname
         
         if not hostname:
-            return False # Gak ada hostname = BAHAYA
+            return False 
 
-        # 2. Blokir string 'localhost' secara eksplisit
+        # 2. Blokir 'localhost' string
         if hostname.lower() == 'localhost':
             print(f"[SECURITY BLOCK] Domain Localhost terdeteksi.")
             return False
@@ -82,11 +81,10 @@ def is_safe_target(url):
         try:
             ip_str = socket.gethostbyname(hostname)
         except:
-            # Kalau DNS error, anggap BAHAYA (Fail Safe)
             print(f"[SECURITY BLOCK] Gagal resolve DNS: {hostname}")
             return False
 
-        # 4. Cek apakah IP Private
+        # 4. Cek IP Private
         ip = ipaddress.ip_address(ip_str)
         if ip.is_private or ip.is_loopback or ip.is_link_local:
             print(f"[SECURITY BLOCK] IP Private terdeteksi: {hostname} -> {ip}")
@@ -95,7 +93,7 @@ def is_safe_target(url):
         return True
     except Exception as e:
         print(f"[SECURITY ERROR] Validasi gagal total: {e}")
-        return False # Ada error = BLOKIR
+        return False
 
 def is_safe_url(url):
     if len(url) > 2000: return False
@@ -104,8 +102,6 @@ def is_safe_url(url):
     return True
 
 def resolve_protocol(raw_url):
-    # Fungsi ini HANYA menstandarkan protokol, TIDAK melakukan cek security
-    # Supaya tidak ada bug http://http://
     raw_url = raw_url.strip()
     if raw_url.startswith("http://") or raw_url.startswith("https://"):
         return raw_url
@@ -139,7 +135,6 @@ def trace_redirects(url):
                     if "just a moment" in content or "cloudflare" in content:
                         chain.append({"status": 403, "url": "BLOCKED_BY_CLOUDFLARE"})
                         break
-                    # (Simple regex extraction)
                     meta = re.findall(r'content=["\']\d+;\s*url=([^"\']+)["\']', content)
                     if meta: next_url = meta[0]
 
@@ -166,30 +161,21 @@ def scan_url():
     if not raw_input: return jsonify({"error": "URL is required"}), 400
     if not is_safe_url(raw_input): return jsonify({"error": "Invalid URL format!"}), 400
     
-    # ---------------------------------------------------------
-    # LANGKAH 1: Standarkan URL (tambah http:// kalau gak ada)
-    # ---------------------------------------------------------
     target_url = resolve_protocol(raw_input)
 
-    # ---------------------------------------------------------
-    # LANGKAH 2: CEK SECURITY (HARUS DISINI!)
-    # ---------------------------------------------------------
-    # Kita cek target_url yang sudah bersih.
+    # CEK SECURITY SSRF (CRITICAL)
     if not is_safe_target(target_url):
         print(f"[BLOCKED] Percobaan scan dilarang ke: {target_url}")
-        # RETURN 403 -> INI YANG BIKIN PESAN ERROR MERAH MUNCUL
         return jsonify({"error": "Access Denied: Scanning Local/Private IP is forbidden."}), 403
 
-    # =========================================================
-    # JIKA LOLOS, BARU LANJUT KE VIRUSTOTAL
-    # =========================================================
+    # VIRUSTOTAL API
     api_key = VT_API_KEY
     if not api_key: return jsonify({"error": "Server Configuration Error"}), 500
 
     try:
         final_dest, redirect_chain = trace_redirects(target_url)
         
-        # Encoding buat VT
+        # Encoding URL untuk VT
         url_id_api = base64.urlsafe_b64encode(target_url.encode()).decode().strip("=")
         headers = {"x-apikey": api_key}
         
@@ -205,7 +191,7 @@ def scan_url():
         if vt_response.status_code >= 400:
             return jsonify({"error": f"API Error: {vt_response.status_code}"}), vt_response.status_code
 
-        # Parsing Data
+        # Parsing Data Response
         data = vt_response.json().get('data', {}).get('attributes', {})
         stats = data.get('last_analysis_stats', {})
         results = data.get('last_analysis_results', {})
@@ -219,7 +205,7 @@ def scan_url():
         trust_score = 100 - (malicious * 20) - (suspicious * 10) if total > 0 else 0
         if trust_score < 0: trust_score = 0
 
-        # Whois Simple
+        # Whois Lookup
         whois_data = None
         try:
             domain = target_url.replace("https://", "").replace("http://", "").split('/')[0]
@@ -242,6 +228,9 @@ def scan_url():
             "undetected": undetected,
             "total_scans": total,
             "reputation": trust_score,
+            # --- FIX: Mengirim SHA256 agar Frontend tidak N/A ---
+            "sha256": data.get("last_http_response_content_sha256"), 
+            # ----------------------------------------------------
             "whois": whois_data,
             "details": [{"engine_name": k, "category": v.get('category'), "result": v.get('result')} for k, v in results.items()]
         })

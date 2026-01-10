@@ -6,6 +6,7 @@ import requests
 import time
 import argparse
 import re
+import hashlib  # [BARU] Import library untuk hashing
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
 
@@ -34,7 +35,7 @@ def print_banner():
     |_____/|_|\__,_|_|_|\_\ |_|\__,_|\__,_|\__|
     """
     print(Fore.CYAN + banner)
-    print(Fore.BLUE + "    Sidiktaut CLI v.0.4 (Full Report)")
+    print(Fore.BLUE + "    Sidiktaut CLI v.0.5 (Crypto Feature)")
     print(Fore.WHITE + "    Created by SidikTaut Team" + Style.RESET_ALL + "\n")
 
 def is_valid_url(url):
@@ -44,10 +45,23 @@ def is_valid_url(url):
 
 def get_url_id(url):
     try:
+        # Base64 Encoding (Cryptography Part 1)
         return base64.urlsafe_b64encode(url.encode()).decode().strip("=")
     except Exception as e:
         print(f"{Fore.RED}[!] Gagal encode URL: {e}")
         sys.exit(1)
+
+# [BARU] Fungsi Membuat Hash (Fingerprint URL)
+def generate_hashes(url):
+    try:
+        data = url.encode('utf-8')
+        return {
+            "MD5": hashlib.md5(data).hexdigest(),
+            "SHA-1": hashlib.sha1(data).hexdigest(),
+            "SHA-256": hashlib.sha256(data).hexdigest()
+        }
+    except Exception as e:
+        return {"Error": str(e)}
 
 def save_to_file(filename, content):
     try:
@@ -161,6 +175,9 @@ def scan_url(target_url, is_detailed=False, allow_submit=True, output_file=None,
 
     print(f"{Fore.BLUE}[*] Menganalisis: {Fore.WHITE}{real_target}")
     
+    # [BARU] Generate Hash
+    hashes = generate_hashes(real_target)
+
     url_id = get_url_id(real_target)
     headers = {"x-apikey": API_KEY, "accept": "application/json"}
     
@@ -175,6 +192,8 @@ def scan_url(target_url, is_detailed=False, allow_submit=True, output_file=None,
             print(f"    {Fore.WHITE}Reputasi     : {attr.get('reputation', 0)}")
             print(f"    {Fore.RED}Malicious    : {stats['malicious']}")
             print(f"    {Fore.GREEN}Harmless     : {stats['harmless']}")
+            # [BARU] Tampilkan Hash di Layar
+            print(f"    {Fore.CYAN}SHA-256      : {hashes['SHA-256'][:30]}...") 
             print(f"    {Fore.WHITE}--------------------------------")
 
             # Fitur Laporan
@@ -183,10 +202,17 @@ def scan_url(target_url, is_detailed=False, allow_submit=True, output_file=None,
             report.append(f"SIDIKTAUT FORENSIC REPORT")
             report.append("="*60)
             report.append(f"Scan Date     : {time.ctime()}")
-            report.append(f"Scan ID       : {data['data']['id']}")
+            report.append(f"Scan ID (B64) : {url_id}") # Tampilkan ID Base64
             report.append(f"Input URL     : {target_url}")          
             report.append(f"Final URL     : {real_target}")
             
+            # [BARU] Section Cryptography di Report
+            report.append("-" * 30)
+            report.append("[CRYPTOGRAPHY / FINGERPRINT]")
+            report.append(f"MD5           : {hashes['MD5']}")
+            report.append(f"SHA-1         : {hashes['SHA-1']}")
+            report.append(f"SHA-256       : {hashes['SHA-256']}")
+
             if redirect_hops:
                 report.append("-" * 30)
                 report.append("[REDIRECT TRACE]")

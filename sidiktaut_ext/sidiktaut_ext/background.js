@@ -5,7 +5,7 @@
 // =================================================================
 // 🔧 KONFIGURASI HYBRID
 // =================================================================
-const IS_DEV = false; // <--- SAKLAR UTAMA (true = Local, false = PythonAnywhere)
+const IS_DEV = true; // <--- SAKLAR UTAMA (true = Local, false = PythonAnywhere)
 
 const API_ENDPOINT = IS_DEV 
   ? "http://127.0.0.1:5000/scan" 
