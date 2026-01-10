@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // false = Mode Production (Pakai Server PythonAnywhere)
   // =================================================================
   
-  const IS_DEV = true; // <--- SAKLAR UTAMA (Ganti true/false disini)
+  const IS_DEV = false; // <--- SAKLAR UTAMA (Ganti true/false disini)
 
   const API_BASE_URL = IS_DEV 
     ? "http://127.0.0.1:5000" 

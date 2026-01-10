@@ -6,7 +6,7 @@ import { ScanResponse } from "../types";
 
 // GANTI JADI 'true'  -> Kalau mau demo pakai Laptop (Localhost)
 // GANTI JADI 'false' -> Kalau mau demo pakai Website Online
-const IS_DEV = true;
+const IS_DEV = false;
 
 const API_BASE_URL = IS_DEV 
   ? "http://127.0.0.1:5000" 
