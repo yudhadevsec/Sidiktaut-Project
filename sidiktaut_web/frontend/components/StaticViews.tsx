@@ -22,7 +22,7 @@ function SecondaryBtn({ icon: Icon, label, onClick, className = "bg-black/20 tex
 // Fungsi Kotak kayak di Scan Satset , Perlindungan Real-time dkk
 function FeatureCard({ icon: Icon, title, desc }: any) {
   return (
-    <div className="bg-white dark:bg-[#121214] p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 flex flex-col gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-blue-500 transition-colors h-full">
+    <div className="bg-white dark:bg-[#121214] p-5 rounded-2xl border border-gray-100 dark:border-gray-800 flex flex-col gap-4 shadow-sm hover:border-blue-500 transition-colors h-full">
       <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-gray-800 shrink-0">
         <Icon size={20} />
       </div>
@@ -41,7 +41,7 @@ export const BrowserView = memo(function BrowserView() {
   return (
     <div className="space-y-6 md:space-y-8 pb-12">
       {/* Kotak utama yang ada tulisan SidikTaut Extension */}
-      <div className="bg-blue-700 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 text-white shadow-[0_20px_50px_-10px_rgba(29,78,216,0.2)] relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-10">
+      <div className="bg-blue-700 rounded-3xl p-6 md:p-8 text-white shadow-[0_20px_50px_-10px_rgba(29,78,216,0.2)] relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8">
         <div className="relative z-10 max-w-2xl w-full">
           <div className="flex flex-wrap items-center gap-3 mb-4 md:mb-6">
             <span className="px-3 py-1 md:px-4 md:py-1.5 bg-blue-800 rounded-full text-[10px] md:text-xs font-bold border border-blue-600 flex items-center gap-2"><Chrome size={14} /> Versi 0.1</span>
@@ -74,7 +74,7 @@ export const BrowserView = memo(function BrowserView() {
           <div className="w-full aspect-video bg-black/5 rounded-[15px] overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 relative group">
             <iframe className="w-full h-full" src="https://www.youtube.com/embed/" title="Tutorial Install Extension" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" loading="lazy"></iframe>
           </div>
-          <div className="bg-white dark:bg-[#121214] rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6 md:space-y-8">
+          <div className="bg-white dark:bg-[#121214] rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-5 md:space-y-6">
             <StepItem number="1" title="Download & Ekstrak">Unduh file <code>sidiktaut-ext.zip</code> dari tombol di atas, lalu ekstrak ke folder komputer kamu.</StepItem>
             <StepItem number="2" title="Buka menu extension">Buka browser, ketik <code>chrome://extensions</code> di address bar, atau buka menu <b>Manage Extensions</b>.</StepItem>
             <StepItem number="3" title="Enable Developer Mode">Aktifkan opsi <b>Developer Mode</b> di pojok kanan atas halaman ekstensi.</StepItem>
@@ -85,7 +85,7 @@ export const BrowserView = memo(function BrowserView() {
         {/* Bagian System Requirements / Persyaratan Sistem */}
         <div className="space-y-6">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full"><Code size={20} /></div> Persyaratan Sistem</h3>
-          <div className="bg-gray-50 dark:bg-[#121214] rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-800 h-fit shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="bg-gray-50 dark:bg-[#121214] rounded-2xl p-6 border border-gray-100 dark:border-gray-800 h-fit shadow-sm">
             <ul className="space-y-4">
               <SpecItem label="Browser Support" value="Chrome, Edge, Brave, Opera, Safari" />
               <SpecItem label="OS Support" value="Windows, macOS, Linux" />
@@ -111,7 +111,7 @@ export const CliView = memo(function CliView() {
 
   return (
     <div className="space-y-6 md:space-y-8 pb-12">
-      <div className="bg-[#1a1a1a] dark:bg-black rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-5 md:gap-8 border border-gray-800 relative overflow-hidden">
+      <div className="bg-[#1a1a1a] dark:bg-black rounded-3xl p-6 md:p-8 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-5 md:gap-8 border border-gray-800 relative overflow-hidden">
          
          {/* Background Logo (Posisi disesuaikan agar pas dengan box yang makin pendek) */}
          <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}><motion.img src="/tux.png" alt="Tux Linux" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }} className="w-full h-full object-contain opacity-50 will-change-transform" loading="lazy" /></div>
@@ -164,7 +164,7 @@ export const CliView = memo(function CliView() {
          </div>
          <div className="space-y-4 md:space-y-6">
             <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-gray-100 dark:bg-gray-800 text-gray-600 rounded-full"><FileText size={18} md:size={20}/></div> Arguments</h3>
-            <div className="bg-white dark:bg-[#121214] rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div className="bg-white dark:bg-[#121214] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm">
                <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                      <thead className="bg-gray-50 dark:bg-white/5 text-gray-500 font-bold uppercase text-[10px] md:text-xs">
@@ -240,7 +240,7 @@ export const TeamView = memo(function TeamView() {
           <button onClick={() => setSelectedMember(null)} className="mb-4 md:mb-6 flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors ml-2 group">
             <div className="p-2 bg-gray-100 dark:bg-white/5 rounded-full group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 transition-colors"><ChevronLeft size={18} /></div> Back to Team
           </button>
-          <div className="bg-white dark:bg-[#121214] rounded-[2.5rem] md:rounded-[3.5rem] p-6 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 flex flex-col md:flex-row gap-6 md:gap-12 items-center md:items-start">
+          <div className="bg-white dark:bg-[#121214] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col md:flex-row gap-6 md:gap-12 items-center md:items-start">
             <div className={`w-32 h-32 md:w-64 md:h-64 shrink-0 rounded-full p-2 border-[3px] border-${selectedMember.color}-100 dark:border-${selectedMember.color}-900`}><img src={selectedMember.image} alt={selectedMember.name} className="w-full h-full object-cover rounded-full bg-gray-100" loading="lazy" /></div>
             <div className="flex-1 text-center md:text-left">
               <span className={`inline-block px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest mb-3 md:mb-4 bg-${selectedMember.color}-100 text-${selectedMember.color}-700 dark:bg-${selectedMember.color}-900/30 dark:text-${selectedMember.color}-400`}>{selectedMember.role}</span>
@@ -266,8 +266,8 @@ export const TeamView = memo(function TeamView() {
           <div className="text-center mb-6 md:mb-8"><h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-2">Meet our <span className="text-blue-600">Team</span></h1><p className="text-sm md:text-base text-gray-500 dark:text-gray-400">Tim dibalik pengembangan SidikTaut.</p></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
             {teamMembers.map((member) => (
-              <motion.div key={member.name} layoutId={member.name} onClick={() => setSelectedMember(member)} className="group cursor-pointer bg-white dark:bg-[#121214] rounded-[2rem] md:rounded-[3.5rem] p-6 md:p-8 border border-gray-100 dark:border-gray-800 hover:border-blue-500 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all flex flex-col items-center text-center relative overflow-hidden" whileHover={{ y: -5 }}>
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full p-1.5 mb-4 md:mb-6 relative z-10 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-700"><img src={member.image} alt={member.name} className="w-full h-full object-cover rounded-full" loading="lazy" /></div>
+              <motion.div key={member.name} layoutId={member.name} onClick={() => setSelectedMember(member)} className="group cursor-pointer bg-white dark:bg-[#121214] rounded-2xl p-6 border border-gray-100 dark:border-gray-800 hover:border-blue-500 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center relative overflow-hidden" whileHover={{ y: -5 }}>
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full p-1.5 mb-4 md:mb-5 relative z-10 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-700"><img src={member.image} alt={member.name} className="w-full h-full object-cover rounded-full" loading="lazy" /></div>
                 <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white relative z-10 group-hover:text-blue-600 transition-colors">{member.name}</h3>
                 <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 md:mb-4 relative z-10 text-${member.color}-600 bg-${member.color}-50 dark:bg-white/5 px-3 py-1 rounded-full mt-2`}>{member.role}</p>
                 <div className="mt-auto px-5 py-2 md:px-6 md:py-3 bg-gray-50 dark:bg-black/20 rounded-full text-[10px] md:text-xs font-bold text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-colors relative z-10 flex items-center gap-2">View Profile <ArrowRight size={14} /></div>
@@ -295,3 +295,28 @@ function SocialBtn({ icon: Icon, label, href }: any) {
     </button>
   ) 
 }
+
+export const AboutView = memo(function AboutView() {
+  return (
+    <div className="space-y-6 md:space-y-8 pb-12">
+      <div className="bg-white dark:bg-[#121214] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-4">Tentang SidikTaut</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+          SidikTaut adalah proyek berbasis pembelajaran (Mini Project Based Learning) yang dirancang untuk menganalisis dan mendeteksi tautan berbahaya. Dibuat dengan tujuan untuk meningkatkan keamanan pengguna internet saat berselancar, menghindari phising, malware, dan ancaman siber lainnya.
+        </p>
+        
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Fitur Utama</h3>
+        <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-gray-400 mb-6">
+          <li><strong>Web Scanner:</strong> Memindai tautan langsung melalui website secara cepat.</li>
+          <li><strong>Browser Extension:</strong> Ekstensi untuk mengecek keamanan tautan tanpa meninggalkan halaman yang sedang dibuka.</li>
+          <li><strong>CLI Tool:</strong> Perangkat baris perintah (Command Line Interface) bagi developer untuk memindai dari terminal.</li>
+        </ul>
+
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Latar Belakang</h3>
+        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+          Proyek ini awalnya dibangun sebagai tugas perkuliahan semester 1. Fokus utamanya adalah memahami dasar-dasar pengembangan web, interaksi API keamanan, dan bagaimana mengemas layanan agar bermanfaat bagi publik.
+        </p>
+      </div>
+    </div>
+  );
+});

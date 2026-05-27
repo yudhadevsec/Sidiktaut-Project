@@ -176,7 +176,7 @@ function ScannerComponent({ onModalChange }: any) {
       {/* INPUT CARD */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-        className={`bg-white dark:bg-[#121214] rounded-[2rem] p-6 md:p-8 border border-gray-100 dark:border-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${result ? 'mb-8' : 'mb-0'}`}
+        className={`bg-white dark:bg-[#121214] rounded-2xl p-5 md:p-6 border border-gray-100 dark:border-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${result ? 'mb-8' : 'mb-0'}`}
       >
         <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
            <div>
@@ -231,7 +231,7 @@ function ScannerComponent({ onModalChange }: any) {
              {/* Kolom Kiri */}
              <div className="lg:col-span-2 flex flex-col gap-6">
                 {/* Skor link (contoh 90/100) */}
-                <div className="bg-white dark:bg-[#121214] border border-gray-100 dark:border-gray-800 rounded-[2rem] p-8 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-[350px]">
+                <div className="bg-white dark:bg-[#121214] border border-gray-100 dark:border-gray-800 rounded-2xl p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-[350px]">
                     <div>
                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-800">Risk Score</span>
                        <div className="mt-6 flex items-baseline gap-3">
