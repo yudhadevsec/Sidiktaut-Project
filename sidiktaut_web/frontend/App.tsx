@@ -86,14 +86,14 @@ export default function App() {
             </div>
             <nav className="flex-1 overflow-y-auto p-4 space-y-1">
                {menuItems.map(item => (
-                  <button key={item.id} onClick={() => handleNavClick(item.id)} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 ${activeView === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}>
+                  <button key={item.id} onClick={() => handleNavClick(item.id)} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-sm text-sm font-bold transition-all active:scale-95 border-l-2 ${activeView === item.id ? 'bg-gray-100 text-gray-900 border-gray-900 dark:bg-white/10 dark:text-white dark:border-white' : 'border-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}>
                      <item.icon size={18} /> {item.label}
                   </button>
                ))}
             </nav>
             <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0A0C]">
-               <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-white dark:bg-[#121214] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white active:scale-95 transition-transform shadow-sm">
-                  {darkMode ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} className="text-blue-500" />} {darkMode ? 'Light Mode' : 'Dark Mode'}
+               <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-sm text-sm font-bold bg-white dark:bg-[#121214] border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white active:scale-95 transition-transform">
+                  {darkMode ? <Sun size={18} className="text-gray-400" /> : <Moon size={18} className="text-gray-500" />} {darkMode ? 'Light Mode' : 'Dark Mode'}
                </button>
             </div>
          </div>
@@ -110,18 +110,18 @@ export default function App() {
                      </div>
                   </div>
                )}
-               <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-xl"><Menu size={24} /></button>
+               <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-sm"><Menu size={24} /></button>
             </div>
             <nav className="flex-1 p-4 space-y-1">
                {menuItems.map(item => (
-                  <button key={item.id} onClick={() => setActiveView(item.id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeView === item.id ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+                  <button key={item.id} onClick={() => setActiveView(item.id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-colors border-l-2 ${activeView === item.id ? 'bg-gray-100 text-gray-900 border-gray-900 dark:bg-white/10 dark:text-white dark:border-white' : 'border-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'} ${sidebarCollapsed ? 'justify-center border-l-0' : ''}`}>
                      <item.icon size={22} />{!sidebarCollapsed && <span>{item.label}</span>}
                   </button>
                ))}
             </nav>
             <div className="p-4 border-t border-gray-100 dark:border-gray-800">
-               <button onClick={() => setDarkMode(!darkMode)} className={`w-full flex items-center gap-2 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors ${sidebarCollapsed ? 'justify-center' : ''}`}>
-                  {darkMode ? <Sun size={20} className="shrink-0" /> : <Moon size={20} className="shrink-0" />}
+               <button onClick={() => setDarkMode(!darkMode)} className={`w-full flex items-center gap-2 p-3 rounded-sm hover:bg-gray-50 dark:hover:bg-white/5 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors ${sidebarCollapsed ? 'justify-center' : ''}`}>
+                  {darkMode ? <Sun size={20} className="shrink-0 text-gray-400" /> : <Moon size={20} className="shrink-0" />}
                   {!sidebarCollapsed && <span className="min-w-[80px] text-left">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>}
                </button>
             </div>
@@ -129,7 +129,7 @@ export default function App() {
 
          {/* MAIN CONTENT */}
          <main className="flex-1 overflow-y-auto pt-20 md:pt-8 px-4 md:px-8 pb-12 relative z-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 pointer-events-none -z-10" />
+            <div className="absolute inset-0 bg-transparent pointer-events-none -z-10" />
             <div className="max-w-5xl mx-auto min-h-[90vh] flex flex-col relative z-10">
                <div className="flex-1">
                   <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="animate-spin text-blue-500" size={32} /></div>}>
@@ -145,6 +145,13 @@ export default function App() {
                      {activeView === 'about' && <AboutView />}
                   </Suspense>
                </div>
+               
+               {/* Minimalist Footer */}
+               <footer className="mt-12 mb-4 text-center">
+                  <p className="text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider">
+                     &copy; {new Date().getFullYear()} SidikTaut. Project Based Learning.
+                  </p>
+               </footer>
             </div>
          </main>
       </div>
