@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, AlertTriangle, Search, Loader2, XCircle, CheckCircle, Eye, X, ChevronLeft, Briefcase, Clock, Fingerprint, HelpCircle, ImageOff, Maximize2, Copy, Check, GitBranch, ChevronDown, ChevronUp, ChevronRight, Map } from 'lucide-react';
 import { scanUrl } from '../services/api';
 import { ScanResponse } from '../types';
+import { ScannerSkeleton } from './Skeleton';
 
 const THREAT_MAP: Record<string, string> = {
   'phishing': 'BAHAYA: Situs ini menyamar menjadi website resmi.',
@@ -200,31 +201,32 @@ function ScannerBlock({ title, subtitle, onModalChange }: any) {
         </div>
 
         <AnimatePresence>
-          {(loading || error) && (
+          {error && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mt-8 flex justify-center overflow-hidden">
-              {loading && (
-                <div className="flex flex-col items-center gap-4 py-4">
-                  <Loader2 className="animate-spin text-gray-900 dark:text-white" size={48} />
-                  <span className="font-bold text-gray-900 dark:text-white tracking-[0.2em] text-xs uppercase">Tunggu sebentar ya</span>
-                  <span className="text-[10px] text-gray-400">Mendeteksi protokol & scanning ancaman</span>
-                </div>
-              )}
-              {error && (
-                <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#121214] border border-gray-200 dark:border-gray-800 flex items-center gap-3 text-gray-900 dark:text-white shadow-sm">
-                  <XCircle size={24} /> <span className="font-bold">{error}</span>
-                </div>
-              )}
+              <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#121214] border border-gray-200 dark:border-gray-800 flex items-center gap-3 text-gray-900 dark:text-white shadow-sm">
+                <XCircle size={24} /> <span className="font-bold">{error}</span>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
 
       {/* Bagian Hasil cek link*/}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
+        {loading && (
+          <motion.div
+            key="skeleton"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.4 }}
+            className="mt-8 w-full"
+          >
+            <ScannerSkeleton />
+          </motion.div>
+        )}
         {result && !loading && (
           <motion.div
+            key="result"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-6"
+            className="space-y-6 mt-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8">
 

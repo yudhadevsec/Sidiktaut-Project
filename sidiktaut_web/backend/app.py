@@ -14,6 +14,8 @@ from urllib.parse import urljoin, urlparse
 import urllib3
 import socket
 import ipaddress
+import ssl
+import difflib
 
 # 1. Matikan Warning SSL (Penting untuk scanning situs malware)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -106,6 +108,51 @@ def resolve_protocol(raw_url):
     if raw_url.startswith("http://") or raw_url.startswith("https://"):
         return raw_url
     return f"http://{raw_url}"
+
+# ==============================================================================
+# ADVANCED SECURITY FEATURES
+# ==============================================================================
+
+POPULAR_DOMAINS = [
+    'facebook.com', 'google.com', 'instagram.com', 'twitter.com', 'x.com',
+    'whatsapp.com', 'netflix.com', 'paypal.com', 'apple.com', 'microsoft.com',
+    'amazon.com', 'klikbca.com', 'bca.co.id', 'bri.co.id', 'bni.co.id', 'mandiri.co.id',
+    'tokopedia.com', 'shopee.co.id', 'gojek.com', 'grab.com'
+]
+
+def check_typosquatting(domain):
+    domain = domain.lower().replace("www.", "")
+    for pop in POPULAR_DOMAINS:
+        if domain == pop:
+            return None # Bukan typo, tapi domain aslinya
+        # Hitung kemiripan
+        similarity = difflib.SequenceMatcher(None, domain, pop).ratio()
+        if similarity > 0.85: # Ambang batas kemiripan
+            return pop
+    return None
+
+def get_ssl_info(hostname):
+    try:
+        hostname = hostname.replace("www.", "")
+        context = ssl.create_default_context()
+        with socket.create_connection((hostname, 443), timeout=3) as sock:
+            with context.wrap_socket(sock, server_hostname=hostname) as ssock:
+                cert = ssock.getpeercert()
+                issuer = dict(x[0] for x in cert.get('issuer', []))
+                issuer_cn = issuer.get('commonName', 'Unknown')
+                not_after = datetime.strptime(cert['notAfter'], '%b %d %H:%M:%S %Y %Z')
+                days_left = (not_after - datetime.utcnow()).days
+                return {
+                    "valid": True,
+                    "issuer": issuer_cn,
+                    "days_left": days_left
+                }
+    except Exception as e:
+        return {
+            "valid": False,
+            "issuer": str(e) if "certificate" in str(e).lower() else "N/A",
+            "days_left": 0
+        }
 
 def trace_redirects(url):
     session = requests.Session()
@@ -207,8 +254,8 @@ def scan_url():
 
         # Whois Lookup
         whois_data = None
+        domain = target_url.replace("https://", "").replace("http://", "").split('/')[0]
         try:
-            domain = target_url.replace("https://", "").replace("http://", "").split('/')[0]
             w = whois.whois(domain)
             date = w.creation_date[0] if isinstance(w.creation_date, list) else w.creation_date
             whois_data = {
@@ -217,6 +264,10 @@ def scan_url():
                 "registrar": str(w.registrar)
             }
         except: pass
+
+        # SSL & Typo-squatting
+        ssl_data = get_ssl_info(domain)
+        typo_match = check_typosquatting(domain)
 
         return jsonify({
             "url": target_url,
@@ -232,6 +283,8 @@ def scan_url():
             "sha256": data.get("last_http_response_content_sha256"), 
             # ----------------------------------------------------
             "whois": whois_data,
+            "ssl_info": ssl_data,
+            "typosquatting": typo_match,
             "details": [{"engine_name": k, "category": v.get('category'), "result": v.get('result')} for k, v in results.items()]
         })
 
@@ -242,5 +295,5 @@ def scan_url():
 if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() == "true"
     port = int(os.getenv("PORT", 5000))
-    print(f"🚀 Running in {'DEBUG' if debug_mode else 'PRODUCTION'} mode on port {port}")
+    print(f"Running in {'DEBUG' if debug_mode else 'PRODUCTION'} mode on port {port}")
     app.run(debug=debug_mode, port=port)
