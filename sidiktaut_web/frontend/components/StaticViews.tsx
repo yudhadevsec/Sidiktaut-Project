@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Kalau mau ganti warna tombol biar Download.zip / Readme.md semua konsisten
 function PrimaryBtn({ icon: Icon, label, onClick, className = "bg-gray-900 text-white dark:bg-white dark:text-gray-900 hover:opacity-80" }: any) {
   return (
-    <button onClick={onClick} className={`px-6 py-3 md:px-8 md:py-4 rounded-full font-bold flex items-center justify-center gap-2 shadow-[0_4px_14px_0_rgb(0,0,0,0.05)] border border-transparent transition-all active:scale-95 text-sm md:text-base ${className}`}>
+    <button onClick={onClick} className={`px-6 py-3 md:px-8 md:py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-[0_4px_14px_0_rgb(0,0,0,0.05)] border border-transparent transition-all active:scale-95 text-sm md:text-base ${className}`}>
       {Icon && <Icon size={18} />} {label}
     </button>
   );
@@ -13,7 +13,7 @@ function PrimaryBtn({ icon: Icon, label, onClick, className = "bg-gray-900 text-
 
 function SecondaryBtn({ icon: Icon, label, onClick, className = "bg-black/20 text-white hover:bg-black/30 border-white/20" }: any) {
   return (
-    <button onClick={onClick} className={`px-5 py-3 md:px-6 md:py-4 rounded-full font-bold flex items-center justify-center gap-2 border transition-all text-sm md:text-base ${className}`}>
+    <button onClick={onClick} className={`px-5 py-3 md:px-6 md:py-4 rounded-2xl font-bold flex items-center justify-center gap-2 border transition-all text-sm md:text-base ${className}`}>
       {Icon && <Icon size={18} />} {label}
     </button>
   );
@@ -208,12 +208,12 @@ export const TeamView = memo(function TeamView() {
               <img src={selectedMember.image} alt={selectedMember.name} className="w-full h-full object-cover" loading="lazy" />
             </div>
             <div className="flex-1 mt-2 md:mt-4">
-              <p className="text-[10px] md:text-xs font-mono font-bold text-gray-400 uppercase tracking-widest mb-3">{selectedMember.role}</p>
+              <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{selectedMember.role}</p>
               <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">{selectedMember.name}</h1>
               <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed mb-6">{selectedMember.full_desc}</p>
 
               <div className="mb-8">
-                <p className="text-[10px] md:text-xs font-mono font-bold text-gray-900 dark:text-white leading-relaxed">
+                <p className="text-[10px] md:text-xs font-bold text-gray-900 dark:text-white leading-relaxed">
                   {selectedMember.skills.join(' • ')}
                 </p>
               </div>
@@ -240,7 +240,7 @@ export const TeamView = memo(function TeamView() {
                   <img src={member.image} alt={member.name} className="w-full h-full object-cover transition-all duration-500 ease-out transform group-hover:scale-110" loading="lazy" />
                 </div>
                 <div className="flex-1 relative z-10">
-                  <p className="text-[9px] font-mono font-bold uppercase tracking-widest mb-1 text-gray-400">{member.role}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-widest mb-1 text-gray-400">{member.role}</p>
                   <h3 className="text-base md:text-lg font-black text-gray-900 dark:text-white tracking-tight mb-1">{member.name}</h3>
                   <div className="flex items-center gap-1 text-[10px] md:text-xs font-bold text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                     Lihat detail <ArrowRight size={12} />
@@ -292,6 +292,13 @@ export const AboutView = memo(function AboutView() {
           Proyek ini awalnya dibangun sebagai tugas perkuliahan semester 1. Fokus utamanya adalah memahami dasar-dasar pengembangan web, interaksi API keamanan, dan bagaimana mengemas layanan agar bermanfaat bagi publik.
         </p>
       </div>
+
+      {/* Minimalist Footer inside About */}
+      <footer className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800/50 text-center opacity-50 hover:opacity-100 transition-opacity duration-300">
+        <p className="text-[10px] font-bold text-gray-500 tracking-widest uppercase">
+          &copy; {new Date().getFullYear()} SidikTaut. Built by Yudha & Team.
+        </p>
+      </footer>
     </div>
   );
 });

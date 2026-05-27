@@ -4,9 +4,8 @@ import { ScanResponse } from "../types";
 // 🎚️ HYBRID MODE SWITCH
 // =================================================================
 
-// GANTI JADI 'true'  -> Kalau mau demo pakai Laptop (Localhost)
-// GANTI JADI 'false' -> Kalau mau demo pakai Website Online
-const IS_DEV = false;
+// OTOMATIS: true jika npm run dev (Localhost), false jika npm run build (Online)
+const IS_DEV = import.meta.env.DEV;
 
 const API_BASE_URL = IS_DEV 
   ? "http://127.0.0.1:5000" 

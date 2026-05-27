@@ -29,6 +29,14 @@ export interface ScanResponse {
     registrar: string;
   } | null;
 
+  // Fitur Lanjutan (SSL & Typosquatting)
+  ssl_info?: {
+    valid: boolean;
+    issuer: string;
+    days_left: number;
+  } | null;
+  typosquatting?: string | null;
+
   // Detail tiap engine antivirus
   details?: Array<{
     engine_name: string;

@@ -15,8 +15,10 @@ const THREAT_MAP: Record<string, string> = {
   'default_bad': '⚠️ BAHAYA: Terdeteksi mencurigakan.',
 };
 
+import { Columns } from 'lucide-react'; // Import icon Columns
+
 // Terima props onModalChange dari App.tsx
-function ScannerComponent({ onModalChange }: any) {
+function ScannerBlock({ title, subtitle, onModalChange }: any) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -178,21 +180,21 @@ function ScannerComponent({ onModalChange }: any) {
       >
         <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Sidik Scan </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">Mini Project Based Learning by our team</p>
+            <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">{title || 'Sidik Scan'}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 font-medium">{subtitle || 'Mini Project Based Learning by our team'}</p>
           </div>
-          {!result && !loading && (<div className="hidden md:block bg-gray-50 dark:bg-[#0a0a0a] p-4 rounded-3xl text-gray-900 dark:text-white"><Shield size={36} /></div>)}
+
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative group">
             <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"><Search size={22} /></div>
             <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste link kamu disini..."
-              className="w-full h-14 md:h-16 pl-14 pr-6 bg-white dark:bg-[#0a0a0a] rounded-full text-gray-900 dark:text-white font-mono focus:bg-white dark:focus:bg-[#0a0a0a] border-none focus:outline-none text-lg transition-all shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]"
+              className="w-full h-14 md:h-16 pl-14 pr-6 bg-white dark:bg-[#0a0a0a] rounded-2xl text-gray-900 dark:text-white font-mono focus:bg-white dark:focus:bg-[#0a0a0a] border-none focus:outline-none text-lg transition-all shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]"
               onKeyDown={(e) => e.key === 'Enter' && handleScan()} />
           </div>
           <button onClick={handleScan} disabled={loading || !url}
-            className="h-14 md:h-16 px-8 bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black rounded-full font-bold tracking-wider active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 shrink-0 shadow-none border-none transition-all text-lg">
+            className="h-14 md:h-16 px-8 bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black rounded-2xl font-bold tracking-wider active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 shrink-0 shadow-none border-none transition-all text-lg">
             <Search size={22} /> SCAN
           </button>
         </div>
@@ -228,20 +230,51 @@ function ScannerComponent({ onModalChange }: any) {
 
               {/* Kolom Kiri */}
               <div className="lg:col-span-2 flex flex-col gap-6">
-                {/* Skor link (contoh 90/100) */}
-                <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-[32px] p-6 md:p-8 flex flex-col justify-between min-h-[350px]">
+
+                {/* TYPOSQUATTING BANNER */}
+                {result.typosquatting && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 md:p-6 rounded-2xl flex items-start gap-4">
+                    <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={24} />
+                    <div>
+                      <h3 className="text-red-800 dark:text-red-200 font-black text-sm md:text-base uppercase tracking-wider mb-1">Peringatan Typo-squatting!</h3>
+                      <p className="text-red-700 dark:text-red-300 text-xs md:text-sm font-medium">
+                        Domain ini mencoba meniru <strong>{result.typosquatting}</strong>. Sangat mungkin ini adalah situs Phising!
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-2xl p-6 md:p-8 flex flex-col justify-between">
                   <div>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-sm border-l-2 border-gray-200 dark:border-gray-700">Tingkat Bahaya (Threat Level)</span>
-                    <div className="mt-6 flex items-baseline gap-3">
-                      <h2 className={`text-7xl md:text-9xl font-mono font-bold tracking-tighter leading-none ${result.total_scans === 0 ? 'text-gray-400' : 'text-gray-900 dark:text-white'}`}>
-                        {threatScore}
-                      </h2>
-                      <div className="flex flex-col">
-                        <span className="text-2xl md:text-4xl text-gray-300 dark:text-gray-600 font-mono font-bold">/100</span>
-                        <span className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">THREAT SCORE</span>
+                    <span className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 dark:bg-white/5 px-3 py-1.5 rounded-md border-l-4 border-gray-300 dark:border-gray-700">Tingkat Bahaya</span>
+                    
+                    <div className="mt-8 mb-6">
+                      <div className="flex justify-between items-end mb-3">
+                        <div className="flex items-baseline gap-2">
+                          <h2 className={`text-6xl md:text-7xl font-black tracking-tighter leading-none ${result.total_scans === 0 ? 'text-gray-400' : 'text-gray-900 dark:text-white'}`}>
+                            {threatScore}
+                          </h2>
+                          <span className="text-xl md:text-2xl font-bold text-gray-400 dark:text-gray-600">/100</span>
+                        </div>
+                        <span className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">THREAT SCORE</span>
+                      </div>
+                      
+                      {/* Premium Bar Chart (iPhone Style) */}
+                      <div className="w-full h-4 bg-gray-200/80 dark:bg-gray-800/80 rounded-full overflow-hidden backdrop-blur-sm relative border border-gray-300/50 dark:border-white/10">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${threatScore}%` }}
+                          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                          className={`absolute top-0 left-0 h-full rounded-full ${
+                            threatScore >= 30 ? 'bg-gradient-to-r from-red-500 to-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 
+                            (threatScore > 0 ? 'bg-gradient-to-r from-amber-500 to-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 
+                            'bg-gradient-to-r from-green-500 to-green-400 shadow-[0_0_15px_rgba(34,197,94,0.5)]')
+                          }`}
+                        />
                       </div>
                     </div>
-                    <div className={`mt-6 inline-flex items-center gap-3 px-5 py-3 rounded-2xl font-bold text-sm md:text-base text-gray-900 bg-gray-100 border-gray-200 dark:bg-white/10 dark:text-white dark:border-gray-700`}>
+
+                    <div className={`inline-flex items-center gap-3 px-5 py-3 rounded-xl font-bold text-sm md:text-base text-gray-900 bg-gray-100 border border-gray-200 dark:bg-white/10 dark:text-white dark:border-gray-800`}>
                       {result.total_scans === 0 ? <HelpCircle size={20} /> : (threatScore > 0 ? <AlertTriangle size={20} /> : <CheckCircle size={20} />)}
                       <span>{getRiskLabel(threatScore, result.total_scans)}</span>
                     </div>
@@ -260,13 +293,13 @@ function ScannerComponent({ onModalChange }: any) {
                     </div>
 
                     {!showPreview ? (
-                      <button onClick={handleLoadPreview} className="w-full h-24 md:h-32 bg-white dark:bg-[#0a0a0a] rounded-[24px] flex flex-col items-center justify-center gap-3 hover:bg-gray-100 dark:hover:bg-[#1c1c1e] transition-colors">
+                      <button onClick={handleLoadPreview} className="w-full h-24 md:h-32 bg-white dark:bg-[#0a0a0a] rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-gray-100 dark:hover:bg-[#1c1c1e] transition-colors">
                         <Eye size={24} className="text-gray-400" />
                         <span className="text-xs font-bold text-gray-500">Klik untuk Load Preview (Hemat Data)</span>
                       </button>
                     ) : (
                       <div
-                        className={`relative w-full h-56 md:h-72 bg-white dark:bg-[#0a0a0a] rounded-[24px] overflow-hidden flex items-center justify-center group ${!previewLoading && !previewError ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''}`}
+                        className={`relative w-full h-56 md:h-72 bg-white dark:bg-[#0a0a0a] rounded-2xl overflow-hidden flex items-center justify-center group ${!previewLoading && !previewError ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''}`}
                         onClick={() => !previewLoading && !previewError && setZoomImage(true)}
                       >
                         {/* Tombol nav kiri */}
@@ -344,7 +377,7 @@ function ScannerComponent({ onModalChange }: any) {
 
                 {/* List Hop (dari trace redirect link) */}
                 {result.redirects && result.redirects.length > 1 && (
-                  <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-[32px] p-6 md:p-8">
+                  <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-2xl p-6 md:p-8">
                     <button
                       onClick={() => setShowTrace(!showTrace)}
                       className="w-full flex items-center justify-between group"
@@ -394,20 +427,20 @@ function ScannerComponent({ onModalChange }: any) {
               {/* Kolom Kanan */}
               {/* Berisi Kotak hitam analisis ancaman dan detail dari link */}
               <div className="flex flex-col gap-5">
-                <div className="bg-[#121214] dark:bg-[#0a0a0a] rounded-[32px] p-6 md:p-8 text-white">
-                  <h3 className="font-bold text-sm mb-6 flex items-center gap-2"><Shield className="text-white" size={18} /> Analisis Ancaman</h3>
-                  <div className="space-y-3 mb-8">
-                    <StatRow label="Malicious" value={result.malicious || 0} color="text-white" bg="bg-white/10" icon={AlertTriangle} />
-                    <StatRow label="Suspicious" value={result.suspicious || 0} color="text-white" bg="bg-white/10" icon={AlertTriangle} />
-                    <StatRow label="Clean" value={result.harmless || 0} color="text-white" bg="bg-white/10" icon={CheckCircle} />
+                <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-2xl p-6 md:p-8">
+                  <h3 className="font-bold text-sm mb-6 flex items-center gap-2 text-gray-900 dark:text-white pb-3 border-b border-gray-100 dark:border-gray-800"><Shield className="text-gray-900 dark:text-white" size={18} /> Analisis Ancaman</h3>
+                  <div className="space-y-4 mb-8">
+                    <StatRow label="Malicious" value={result.malicious || 0} color="text-red-500" icon={AlertTriangle} />
+                    <StatRow label="Suspicious" value={result.suspicious || 0} color="text-amber-500" icon={AlertTriangle} />
+                    <StatRow label="Clean" value={result.harmless || 0} color="text-green-500" icon={CheckCircle} />
                   </div>
-                  <button onClick={() => setShowModal(true)} className="w-full py-4 bg-white text-black hover:bg-gray-200 rounded-full font-bold text-xs flex items-center justify-center gap-3 transition-colors active:scale-95">
+                  <button onClick={() => setShowModal(true)} className="w-full py-4 bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black rounded-2xl font-bold text-xs flex items-center justify-center gap-3 transition-colors active:scale-95">
                     <Eye size={16} /> Lihat Detail
                   </button>
                 </div>
 
                 {/* Bagian tentang Domain (whois) dan Hash SHA-256*/}
-                <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-[32px] p-6 md:p-8">
+                <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-2xl p-6 md:p-8">
                   <h3 className="font-bold text-sm mb-6 flex items-center gap-2 text-gray-900 dark:text-white pb-3 border-b border-gray-100 dark:border-gray-800">
                     <Briefcase className="text-gray-900 dark:text-white" size={18} /> Tentang Domain ini
                   </h3>
@@ -439,6 +472,33 @@ function ScannerComponent({ onModalChange }: any) {
 
                     </div>
                   ) : <div className="text-center py-4 text-gray-400 text-sm font-bold bg-gray-50 dark:bg-white/5 rounded-sm border border-dashed border-gray-200 dark:border-gray-800">Whois Hidden</div>}
+
+                  {/* SSL INFO WIDGET */}
+                  <div className="mt-6 border-t border-gray-100 dark:border-gray-800/50 pt-6">
+                    <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Sertifikat HTTPS</h4>
+                    {result.ssl_info ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Status SSL</span>
+                          {result.ssl_info.valid ? (
+                            <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-sm uppercase"><Check size={12} /> Valid</span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-sm uppercase"><XCircle size={12} /> Tidak Valid</span>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Penerbit (Issuer)</span>
+                          <span className="text-xs font-bold text-gray-900 dark:text-white text-right max-w-[150px] truncate" title={result.ssl_info.issuer}>{result.ssl_info.issuer}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Sisa Aktif</span>
+                          <span className="text-xs font-bold text-gray-900 dark:text-white">{result.ssl_info.days_left} Hari</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 text-gray-400 text-[10px] font-bold uppercase bg-gray-50 dark:bg-white/5 rounded-sm">Tidak ada SSL</div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -514,7 +574,46 @@ function ScannerComponent({ onModalChange }: any) {
   );
 }
 
-function StatRow({ label, value, color, bg, icon: Icon }: any) {
-  return (<div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 shadow-sm"><div className="flex items-center gap-3"><div className={`p-2 rounded-xl ${bg} ${color}`}><Icon size={18} /></div><span className="text-sm font-bold text-gray-300 font-mono">{label}</span></div><span className={`text-xl font-mono font-black ${color}`}>{value}</span></div>)
+function StatRow({ label, value, color, icon: Icon }: any) {
+  return (
+    <div className="flex items-center justify-between py-2">
+      <div className="flex items-center gap-3">
+        <Icon size={18} className={color} />
+        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{label}</span>
+      </div>
+      <span className={`text-xl font-mono font-black ${color}`}>{value}</span>
+    </div>
+  )
 }
-export default memo(ScannerComponent);
+export default memo(function ScannerComponent({ onModalChange }: any) {
+  const [splitMode, setSplitMode] = useState(false);
+
+  return (
+    <div className="w-full relative">
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={() => setSplitMode(!splitMode)}
+          className="px-4 py-2 bg-white dark:bg-[#121214] text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 rounded-full font-bold text-xs flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors shadow-sm active:scale-95"
+        >
+          <Columns size={16} />
+          {splitMode ? 'Tutup Mode Bandingkan' : 'Mode Bandingkan (Split View)'}
+        </button>
+      </div>
+
+      <div className={`grid gap-8 ${splitMode ? 'grid-cols-1 2xl:grid-cols-2' : 'grid-cols-1'}`}>
+        <ScannerBlock
+          title={splitMode ? "Target Scan A" : "Sidik Scan"}
+          subtitle={splitMode ? "Masukkan URL target pertama" : "Mini Project Based Learning by our team"}
+          onModalChange={onModalChange}
+        />
+        {splitMode && (
+          <ScannerBlock
+            title="Target Scan B"
+            subtitle="Masukkan URL target kedua untuk perbandingan"
+            onModalChange={onModalChange}
+          />
+        )}
+      </div>
+    </div>
+  );
+});

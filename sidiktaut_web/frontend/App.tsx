@@ -146,12 +146,7 @@ export default function App() {
                   </Suspense>
                </div>
                
-               {/* Minimalist Footer */}
-               <footer className="mt-12 mb-4 text-center">
-                  <p className="text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider">
-                     &copy; {new Date().getFullYear()} SidikTaut. Project Based Learning.
-                  </p>
-               </footer>
+               {/* Footer dihapus dari dashboard utama, dipindah ke halaman About */}
             </div>
          </main>
       </div>
