@@ -118,15 +118,21 @@ function ScannerComponent({ onModalChange }: any) {
     });
   }, [result, activeFilter]);
 
+  const threatScore = useMemo(() => {
+    if (!result || result.total_scans === 0) return 0;
+    // Asumsi: setiap malicious flag bernilai 15 poin bahaya, suspicious bernilai 5 poin
+    const score = (result.malicious * 15) + (result.suspicious * 5);
+    return Math.min(score, 100);
+  }, [result]);
+
   const getStatusColor = (score: number, totalScans: number) => {
     return 'text-gray-900 bg-gray-100 border-gray-200 dark:bg-white/10 dark:text-white dark:border-gray-700';
   };
 
-  const getRiskLabel = (score: number, totalScans: number) => {
+  const getRiskLabel = (threat: number, totalScans: number) => {
     if (totalScans === 0) return 'UNVERIFIED / UNKNOWN';
-    if (score === 100) return 'PERFECTLY SAFE';
-    if (score >= 80) return 'MOSTLY SAFE';
-    if (score >= 60) return 'SUSPICIOUS';
+    if (threat === 0) return 'PERFECTLY SAFE';
+    if (threat < 30) return 'SUSPICIOUS';
     return 'CRITICAL THREAT';
   };
 
@@ -215,7 +221,7 @@ function ScannerComponent({ onModalChange }: any) {
       <AnimatePresence>
         {result && !loading && (
           <motion.div
-            initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-6"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8">
@@ -225,19 +231,19 @@ function ScannerComponent({ onModalChange }: any) {
                 {/* Skor link (contoh 90/100) */}
                 <div className="bg-gray-50 md:bg-gray-50/80 dark:bg-[#121214] md:dark:bg-[#0a0a0a] rounded-[32px] p-6 md:p-8 flex flex-col justify-between min-h-[350px]">
                   <div>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-sm border-l-2 border-gray-200 dark:border-gray-700">Risk Score</span>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-sm border-l-2 border-gray-200 dark:border-gray-700">Tingkat Bahaya (Threat Level)</span>
                     <div className="mt-6 flex items-baseline gap-3">
                       <h2 className={`text-7xl md:text-9xl font-mono font-bold tracking-tighter leading-none ${result.total_scans === 0 ? 'text-gray-400' : 'text-gray-900 dark:text-white'}`}>
-                        {result.reputation}
+                        {threatScore}
                       </h2>
                       <div className="flex flex-col">
                         <span className="text-2xl md:text-4xl text-gray-300 dark:text-gray-600 font-mono font-bold">/100</span>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Trust Level</span>
+                        <span className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">THREAT SCORE</span>
                       </div>
                     </div>
-                    <div className={`mt-6 inline-flex items-center gap-3 px-5 py-3 rounded-2xl font-bold text-sm md:text-base ${getStatusColor(result.reputation, result.total_scans)}`}>
-                      {result.total_scans === 0 ? <HelpCircle size={20} /> : (result.reputation < 80 ? <AlertTriangle size={20} /> : <CheckCircle size={20} />)}
-                      <span>{getRiskLabel(result.reputation, result.total_scans)}</span>
+                    <div className={`mt-6 inline-flex items-center gap-3 px-5 py-3 rounded-2xl font-bold text-sm md:text-base text-gray-900 bg-gray-100 border-gray-200 dark:bg-white/10 dark:text-white dark:border-gray-700`}>
+                      {result.total_scans === 0 ? <HelpCircle size={20} /> : (threatScore > 0 ? <AlertTriangle size={20} /> : <CheckCircle size={20} />)}
+                      <span>{getRiskLabel(threatScore, result.total_scans)}</span>
                     </div>
                   </div>
 
