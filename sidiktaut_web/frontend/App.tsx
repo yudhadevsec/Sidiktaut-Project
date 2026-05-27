@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react';
-import { LayoutDashboard, Globe, Terminal, Users, Menu, X, Sun, Moon, Shield, Copy, MapPin, Zap, Wifi, Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, Suspense, lazy } from 'react';
+import { LayoutDashboard, Globe, Terminal, Users, Menu, X, Sun, Moon, Loader2 } from 'lucide-react';
 import Scanner from './components/Scanner';
-import { BrowserView, CliView, TeamView } from './components/StaticViews';
+import ConnectionIdentity from './components/ConnectionIdentity';
+
+// LAZY LOADING KOMPONEN HALAMAN
+const BrowserView = lazy(() => import('./components/StaticViews').then(m => ({ default: m.BrowserView })));
+const CliView = lazy(() => import('./components/StaticViews').then(m => ({ default: m.CliView })));
+const TeamView = lazy(() => import('./components/StaticViews').then(m => ({ default: m.TeamView })));
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
   
-  // untuk animasi Navbar Slide Up
+  // State untuk animasi Navbar Slide Up
   const [hideMobileNav, setHideMobileNav] = useState(false);
 
   // Logika DARK MODE
@@ -22,11 +26,6 @@ export default function App() {
     return false;
   });
   
-  // State / Untuk data IP address
-  const [ipData, setIpData] = useState<any>(null);
-  const [ipCopied, setIpCopied] = useState(false);
-
-  // Terapkan Dark Mode
   useEffect(() => {
     const root = window.document.documentElement;
     if (darkMode) {
@@ -38,55 +37,6 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Ngambil IP dari ipapi.co , kalau limit langsung ke ipwho.is 
-  // + Data disimpan juga di sessionstorage (cache), jadi gak perlu request ulang
-  useEffect(() => {
-    const fetchIpSmart = async () => {
-      const cached = sessionStorage.getItem('sidiktaut_ip_cache');
-      if (cached) {
-        setIpData(JSON.parse(cached));
-        return;
-      }
-
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        if (!res.ok) throw new Error("Limit");
-        const data = await res.json();
-        const cleanData = {
-            ip: data.ip, city: data.city, country_code: data.country_code, org: data.org
-        };
-        setIpData(cleanData);
-        sessionStorage.setItem('sidiktaut_ip_cache', JSON.stringify(cleanData));
-      } catch (e) {
-        // Langsung ke ipwho.is kalau ipapi.co limit
-        try {
-            const resBackup = await fetch('https://ipwho.is/');
-            if (!resBackup.ok) throw new Error("Backup Limit");
-            const dataBackup = await resBackup.json();
-            const cleanDataBackup = {
-                ip: dataBackup.ip, city: dataBackup.city, country_code: dataBackup.country_code, 
-                org: dataBackup.connection?.isp || dataBackup.isp
-            };
-            setIpData(cleanDataBackup);
-            sessionStorage.setItem('sidiktaut_ip_cache', JSON.stringify(cleanDataBackup));
-        } catch (finalError) {
-            setIpData({ ip: "Unavailable", city: "-", country_code: "-", org: "Connection Offline" });
-        }
-      }
-    };
-    fetchIpSmart();
-  }, []);
-
-  const copyIp = () => {
-    if(ipData?.ip && ipData.ip !== 'Unavailable') {
-        navigator.clipboard.writeText(ipData.ip);
-        setIpCopied(true);
-        setTimeout(() => setIpCopied(false), 2000);
-    }
-  };
-
-
-  // Daftar Menu Navigasi Bar (Navbar)
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard},
     { id: 'browser', label: 'Extension', icon: Globe },
@@ -100,22 +50,12 @@ export default function App() {
     window.scrollTo(0,0);
   };
 
-  const pageTransition = {
-    initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -10 },
-    transition: { duration: 0.15, ease: "easeOut" }
-  };
-
   return (
-    
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-white font-sans overflow-hidden transition-all duration-700 ease-in-out">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-white font-sans overflow-hidden transition-colors duration-300">
       
-      {/* MOBILE HEADER*/}
-      <motion.div 
-         animate={{ y: hideMobileNav ? "-100%" : "0%" }}
-         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-         className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50 shadow-sm"
+      {/* MOBILE HEADER - PURE CSS ANIMATION (Tanpa Javascript) */}
+      <div 
+         className={`md:hidden fixed top-0 left-0 right-0 h-16 bg-white/95 dark:bg-[#121214]/95 border-b border-gray-200/50 dark:border-gray-800/50 flex items-center justify-between px-4 z-50 shadow-sm transition-transform duration-300 ${hideMobileNav ? '-translate-y-full' : 'translate-y-0'}`}
       >
          <div className="flex items-center gap-3">
             <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
@@ -125,55 +65,36 @@ export default function App() {
             </div>
          </div>
          <button onClick={() => setMobileMenuOpen(true)} className="p-2"><Menu size={24}/></button>
-      </motion.div>
+      </div>
 
-      {/* MOBILE DRAWER */}
-      <AnimatePresence>
-      {mobileMenuOpen && (
-        <>
-        {/* OVERLAY BACKGROUND (ada animasi) */}
-        <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden" 
-            onClick={() => setMobileMenuOpen(false)} 
-        />
-        
-        {/* SIDEBAR PANEL */}
-        <motion.div 
-            initial={{ x: "100%" }} 
-            animate={{ x: "0%" }} 
-            exit={{ x: "100%" }} 
-            transition={{ 
-                type: "spring", 
-                stiffness: 300, 
-                damping: 30,    
-                mass: 1         
-            }} 
-            className="fixed top-0 right-0 z-[70] w-64 h-full bg-white dark:bg-[#121214] border-l border-gray-100 dark:border-gray-800 flex flex-col md:hidden shadow-2xl"
-        >
-            <div className="flex justify-between items-center p-5 border-b border-gray-100 dark:border-gray-800">
-                <span className="font-bold text-lg text-gray-900 dark:text-white">Menu</span>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 active:scale-90 transition-transform"><X size={20}/></button>
-            </div>
-            <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-                {menuItems.map(item => (
-                <button key={item.id} onClick={() => handleNavClick(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${activeView === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}>
-                    <item.icon size={18} /> {item.label}
-                </button>
-                ))}
-            </nav>
-            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0A0C]">
-                <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-white dark:bg-[#121214] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white active:scale-95 transition-transform shadow-sm">
-                {darkMode ? <Sun size={18} className="text-amber-500"/> : <Moon size={18} className="text-blue-500"/>} {darkMode ? 'Light Mode' : 'Dark Mode'}
-                </button>
-            </div>
-        </motion.div>
-        </>
-      )}
-      </AnimatePresence>
+      {/* MOBILE DRAWER - PURE CSS */}
+      {/* OVERLAY BACKGROUND */}
+      <div 
+          className={`fixed inset-0 z-[60] bg-black/60 md:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} 
+          onClick={() => setMobileMenuOpen(false)} 
+      />
+      
+      {/* SIDEBAR PANEL */}
+      <div 
+          className={`fixed top-0 right-0 z-[70] w-64 h-full bg-white dark:bg-[#121214] border-l border-gray-100 dark:border-gray-800 flex flex-col md:hidden shadow-2xl transition-transform duration-300 will-change-transform ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+          <div className="flex justify-between items-center p-5 border-b border-gray-100 dark:border-gray-800">
+              <span className="font-bold text-lg text-gray-900 dark:text-white">Menu</span>
+              <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 active:scale-90 transition-transform"><X size={20}/></button>
+          </div>
+          <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+              {menuItems.map(item => (
+              <button key={item.id} onClick={() => handleNavClick(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${activeView === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}>
+                  <item.icon size={18} /> {item.label}
+              </button>
+              ))}
+          </nav>
+          <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0A0C]">
+              <button onClick={() => setDarkMode(!darkMode)} className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-white dark:bg-[#121214] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white active:scale-95 transition-transform shadow-sm">
+              {darkMode ? <Sun size={18} className="text-amber-500"/> : <Moon size={18} className="text-blue-500"/>} {darkMode ? 'Light Mode' : 'Dark Mode'}
+              </button>
+          </div>
+      </div>
 
       {/* SIDEBAR DESKTOP */}
       <aside className={`hidden md:flex flex-col border-r border-gray-100 dark:border-gray-800 bg-white dark:bg-[#121214] transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
@@ -209,49 +130,17 @@ export default function App() {
          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 pointer-events-none -z-10" />
          <div className="max-w-6xl mx-auto min-h-[90vh] flex flex-col relative z-10">
             <div className="flex-1">
-               <AnimatePresence mode="wait">
-                   {activeView === 'dashboard' && (
-                     <motion.div key="dashboard" {...pageTransition} className="space-y-8">
-                       <Scanner onModalChange={setHideMobileNav} />
-                       
-                       <div>
-                          <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 text-sm uppercase tracking-wider mb-4 px-1"><Wifi size={18} className="text-blue-500"/> Identitas Koneksi Anda</h3>
-                          <div className="bg-white dark:bg-[#121214] p-6 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col md:flex-row gap-6">
-                              <div className="flex-1 bg-gray-50 dark:bg-white/5 rounded-3xl p-6 border border-gray-100 dark:border-gray-800/50 flex flex-col justify-center">
-                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><Globe size={14}/> Public IP</span>
-                                    {ipData?.ip !== 'Unavailable' && (
-                                      <div className="flex items-center gap-2 px-2 py-1 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-900/30">
-                                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                          <span className="text-[10px] font-bold text-green-600 dark:text-green-400">ONLINE</span>
-                                      </div>
-                                    )}
-                                 </div>
-                                 <div className="flex items-center justify-between gap-2">
-                                    <h2 className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight break-all">{ipData?.ip || "Loading..."}</h2>
-                                    <button onClick={copyIp} className="p-3 bg-white dark:bg-black/20 rounded-xl text-gray-400 hover:text-blue-600 border border-gray-50 dark:border-gray-800 shrink-0">
-                                            {ipCopied ? <Check size={20} className="text-green-500"/> : <Copy size={20}/>}
-                                    </button>
-                                 </div>
-                              </div>
-                              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                  <div className="p-5 bg-blue-50 dark:bg-blue-900/10 rounded-3xl border border-blue-100 dark:border-blue-900/20">
-                                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2"><Zap size={18}/> <span className="text-xs font-black uppercase tracking-wider">ISP</span></div>
-                                      <p className="font-bold text-lg text-gray-900 dark:text-white leading-tight">{ipData?.org || "Mendeteksi..."}</p>
-                                  </div>
-                                  <div className="p-5 bg-purple-50 dark:bg-purple-900/10 rounded-3xl border border-purple-100 dark:border-purple-900/20">
-                                      <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-2"><MapPin size={18}/> <span className="text-xs font-black uppercase tracking-wider">Lokasi</span></div>
-                                      <p className="font-bold text-lg text-gray-900 dark:text-white leading-tight">{ipData?.city ? `${ipData.city}, ${ipData.country_code}` : "Mencari..."}</p>
-                                  </div>
-                              </div>
-                          </div>
-                       </div>
-                     </motion.div>
-                   )}
-                   {activeView === 'browser' && <motion.div key="browser" {...pageTransition}><BrowserView /></motion.div>}
-                   {activeView === 'cli' && <motion.div key="cli" {...pageTransition}><CliView /></motion.div>}
-                   {activeView === 'team' && <motion.div key="team" {...pageTransition}><TeamView /></motion.div>}
-               </AnimatePresence>
+               <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="animate-spin text-blue-500" size={32} /></div>}>
+                 {activeView === 'dashboard' && (
+                   <div className="space-y-8">
+                     <Scanner onModalChange={setHideMobileNav} />
+                     <ConnectionIdentity />
+                   </div>
+                 )}
+                 {activeView === 'browser' && <BrowserView />}
+                 {activeView === 'cli' && <CliView />}
+                 {activeView === 'team' && <TeamView />}
+               </Suspense>
             </div>
          </div>
       </main>

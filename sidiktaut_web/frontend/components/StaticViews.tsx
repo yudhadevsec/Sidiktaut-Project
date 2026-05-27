@@ -56,7 +56,7 @@ export const BrowserView = memo(function BrowserView() {
           <PrimaryBtn icon={Download} label="Download .ZIP" onClick={handleDownloadZip} />
         </div>
         <div className="absolute -right-10 -bottom-10 w-64 h-64 md:-right-12 md:-bottom-12 md:w-80 md:h-80 rotate-12 pointer-events-none z-0">
-            <motion.img src="/chrome.png" alt="Chrome Background" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.1, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200" />
+            <motion.img src="/chrome.png" alt="Chrome Background" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.1, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain opacity-50 will-change-transform" loading="lazy" />
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export const BrowserView = memo(function BrowserView() {
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full"><FileText size={18} md:size={20} /></div> Cara Menginstall</h3>
           <div className="w-full aspect-video bg-black/5 rounded-[15px] overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 relative group">
-            <iframe className="w-full h-full" src="https://www.youtube.com/embed/" title="Tutorial Install Extension" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"></iframe>
+            <iframe className="w-full h-full" src="https://www.youtube.com/embed/" title="Tutorial Install Extension" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" loading="lazy"></iframe>
           </div>
           <div className="bg-white dark:bg-[#121214] rounded-[2rem] md:rounded-[2.5rem] border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6 md:space-y-8">
             <StepItem number="1" title="Download & Ekstrak">Unduh file <code>sidiktaut-ext.zip</code> dari tombol di atas, lalu ekstrak ke folder komputer kamu.</StepItem>
@@ -114,8 +114,8 @@ export const CliView = memo(function CliView() {
       <div className="bg-[#1a1a1a] dark:bg-black rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-center gap-5 md:gap-8 border border-gray-800 relative overflow-hidden">
          
          {/* Background Logo (Posisi disesuaikan agar pas dengan box yang makin pendek) */}
-         <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}><motion.img src="/tux.png" alt="Tux Linux" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }} className="w-full h-full object-contain brightness-200 contrast-50" /></div>
-         <div className={`${LOGO_CONFIG.python.mobile} ${LOGO_CONFIG.python.desktop} pointer-events-none select-none z-0`}><motion.img src="/python.png" alt="Python" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain grayscale brightness-200 contrast-50" /></div>
+         <div className={`${LOGO_CONFIG.tux.mobile} ${LOGO_CONFIG.tux.desktop} pointer-events-none select-none z-0`}><motion.img src="/tux.png" alt="Tux Linux" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }} className="w-full h-full object-contain opacity-50 will-change-transform" loading="lazy" /></div>
+         <div className={`${LOGO_CONFIG.python.mobile} ${LOGO_CONFIG.python.desktop} pointer-events-none select-none z-0`}><motion.img src="/python.png" alt="Python" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 0.15, scale: 1 }} transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }} className="w-full h-full object-contain opacity-50 will-change-transform" loading="lazy" /></div>
          
          {/* Content Kiri (Judul dan deskripsi) */}
          <div className="flex-1 relative z-10 w-full">
@@ -154,7 +154,7 @@ export const CliView = memo(function CliView() {
          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-full"><Play size={18} md:size={20}/></div> Contoh penggunaan</h3>
             <div className="w-full aspect-video bg-black/5 rounded-[15px] overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 relative group">
-                <iframe className="w-full h-full" src="https://www.youtube.com/embed/5uE-h-3-3eU?si=iF-b8kk5iCv7Ma0g" title="Tutorial Penggunaan CLI" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"></iframe>
+                <iframe className="w-full h-full" src="https://www.youtube.com/embed/5uE-h-3-3eU?si=iF-b8kk5iCv7Ma0g" title="Tutorial Penggunaan CLI" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" loading="lazy"></iframe>
             </div>
             <div className="space-y-3 md:space-y-4">
                <CodeBlock title="scan standar" cmd="python sidiktaut.py -u google.com" />

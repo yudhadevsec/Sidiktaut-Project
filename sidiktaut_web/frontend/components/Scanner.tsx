@@ -311,9 +311,10 @@ function ScannerComponent({ onModalChange }: any) {
                                                key={currentImageIndex} // Key agar react re-render saat index berubah
                                                src={getPreviewUrl(previewList[currentImageIndex].url)} 
                                                alt={`Preview Step ${currentImageIndex + 1}`} 
-                                               className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" 
+                                               className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 will-change-transform" 
                                                onLoad={() => setPreviewLoading(false)} 
                                                onError={() => { setPreviewLoading(false); setPreviewError(true); }} 
+                                               loading="lazy"
                                            />
                                            
                                            {/* Caption penjelasan di gambar preview (BAGIAN BAWAH) */}
